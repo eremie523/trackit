@@ -5,3 +5,12 @@
 127.0.0.1 - - [22/Jun/2026:11:33:40 +0100] "GET /trackit/patients HTTP/1.1" 200 663
 127.0.0.1 - - [22/Jun/2026:11:33:40 +0100] "GET /favicon.ico HTTP/1.1" 404 683
 127.0.0.1 - - [22/Jun/2026:11:33:54 +0100] "GET /trackit/ws/ecg-monitor HTTP/1.1" 101 -
+127.0.0.1 - - [22/Jun/2026:11:45:08 +0100] "GET /trackit/ws/ecg-monitor HTTP/1.1" 101 -
+127.0.0.1 - - [22/Jun/2026:11:46:09 +0100] "GET /trackit/ws/ecg-monitor HTTP/1.1" 101 -
+127.0.0.1 - - [22/Jun/2026:11:46:46 +0100] "GET /trackit/patient-view.html HTTP/1.1" 200 44791
+127.0.0.1 - - [22/Jun/2026:11:46:46 +0100] "GET /trackit/css/styles.css HTTP/1.1" 200 5170
+127.0.0.1 - - [22/Jun/2026:11:46:46 +0100] "GET /trackit/js/api.js HTTP/1.1" 200 1755
+127.0.0.1 - - [22/Jun/2026:11:46:46 +0100] "GET /trackit/patients HTTP/1.1" 200 663
+127.0.0.1 - - [22/Jun/2026:11:46:47 +0100] "GET /favicon.ico HTTP/1.1" 404 683
+127.0.0.1 - - [22/Jun/2026:11:46:57 +0100] "GET /trackit/ws/ecg-monitor HTTP/1.1" 101 -
+127.0.0.1 - - [22/Jun/2026:11:53:04 +0100] "GET /trackit/ws/ecg-monitor HTTP/1.1" 101 -
