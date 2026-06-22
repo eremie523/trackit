@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trackit - Patient Portal</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      background: var(--bg);
+    }
+
+    .wave-light {
+      position: fixed;
+      right: 0;
+      top: 60px;
+      width: 50%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .wave-dark {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .portal-wrapper {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: calc(100vh - 72px);
+      padding: 34px 18px 54px;
+    }
+
+    .portal-stack {
+      width: 100%;
+      max-width: 1120px;
+      display: grid;
+      gap: 22px;
+      justify-items: center;
+    }
+
+    .login-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      padding: 24px 48px 42px;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: var(--shadow);
+    }
+
+    .login-avatar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .login-avatar .avatar-circle {
+      width: 50px;
+      height: 50px;
+      background: var(--green-main);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-avatar svg {
+      width: 32px;
+      height: 32px;
+      fill: var(--white);
+    }
+
+    .portal-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #edfaf3;
+      border: 1.5px solid var(--green-main);
+      color: var(--green-main);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 999px;
+    }
+
+    .login-title {
+      text-align: center;
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 4px;
+    }
+
+    .login-subtitle {
+      text-align: center;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 0;
+      line-height: 1.5;
+    }
+
+    .error-msg {
+      display: none;
+      background: #fef2f2;
+      border: 1.5px solid #fca5a5;
+      color: #dc2626;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.88rem;
+      margin-bottom: 16px;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .error-msg.show {
+      display: flex;
+    }
+
+    .login-field {
+      margin-bottom: 20px;
+    }
+
+    .login-field label {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+
+    .input-with-icon {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-with-icon .icon-left {
+      position: absolute;
+      left: 14px;
+      color: var(--text-muted);
+      display: flex;
+    }
+
+    .input-with-icon .form-control {
+      height: 46px;
+      padding-left: 44px;
+      padding-right: 14px;
+    }
+
+    .btn-login {
+      width: 100%;
+      justify-content: center;
+      padding: 14px;
+      font-size: 1rem;
+      border-radius: var(--radius-md);
+      background: var(--green-main);
+      color: var(--white);
+      border: none;
+    }
+
+    .btn-login:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .records-shell {
+      display: none;
+      width: 100%;
+    }
+
+    .records-shell.show {
+      display: block;
+    }
+
+    .patient-summary {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .patient-summary h2 {
+      color: var(--text-dark);
+      font-size: 1.2rem;
+      margin-bottom: 6px;
+    }
+
+    .quick-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .stat,
+    .vital {
+      border: 1px solid #dce5df;
+      background: #f8fbf9;
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .stat span,
+    .vital span {
+      display: block;
+      color: #6b7b72;
+      font-size: 0.76rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .stat strong {
+      color: var(--text-dark);
+      font-size: 1.2rem;
+    }
+
+    .record-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .record-card {
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      background: white;
+      box-shadow: var(--shadow);
+    }
+
+    .record-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .record-head h3 {
+      color: var(--text-dark);
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      min-width: 84px;
+      justify-content: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .status-healthy {
+      color: #116334;
+      background: #e3f8eb;
+    }
+
+    .status-watch {
+      color: #7a4b00;
+      background: #fff3cf;
+    }
+
+    .status-critical {
+      color: #991b1b;
+      background: #fee2e2;
+    }
+
+    .vital-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .vital strong {
+      color: var(--text-dark);
+      font-size: 0.95rem;
+    }
+
+    .muted {
+      color: #6b7b72;
+      font-size: 0.86rem;
+      line-height: 1.45;
+    }
+
+    .empty-state {
+      padding: 18px;
+      color: #6b7b72;
+      background: #f8fbf9;
+      border: 1px dashed #c8d9cf;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 50;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-weight: 700;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.16);
+      background: #143f2b;
+      color: white;
+      display: none;
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    @media screen and (max-width: 768px) {
+      .navbar {
+        padding: 10px 15px;
+        min-height: 70px;
+      }
+
+      .navbar-nav {
+        display: none;
+      }
+
+      .portal-wrapper {
+        padding: 24px 15px 40px;
+      }
+
+      .login-card {
+        max-width: 400px;
+        padding: 20px;
+      }
+
+      .wave-light {
+        width: 70%;
+      }
+
+      .quick-stats,
+      .vital-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media screen and (max-width: 600px) {
+      .portal-wrapper {
+        align-items: flex-start;
+        padding-top: 30px;
+      }
+
+      .login-card {
+        max-width: 100%;
+        padding: 18px;
+        border-radius: 16px;
+      }
+
+      .login-avatar {
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .login-title {
+        font-size: 1.1rem;
+      }
+
+      .login-subtitle {
+        font-size: 0.8rem;
+      }
+
+      .login-field {
+        margin-bottom: 16px;
+      }
+
+      .quick-stats,
+      .vital-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .record-head {
+        flex-direction: column;
+      }
+
+      .toast {
+        left: 15px;
+        right: 15px;
+        bottom: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <svg class="wave-light" viewBox="0 0 660 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M660 0 C560 70, 420 30, 320 120 C220 210, 120 170, 0 250 L0 520 L660 520 Z"
+          fill="#d6f0e0" opacity="0.7"/>
+  </svg>
+
+  <svg class="wave-dark" viewBox="0 0 1280 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0 240 C90 195, 210 285, 370 240 C510 198, 590 270, 740 215
+             C880 162, 980 258, 1130 198 C1220 165, 1260 185, 1280 175
+             L1280 380 L0 380 Z"
+          fill="url(#patientWave)"/>
+    <defs>
+      <linearGradient id="patientWave" x1="0" y1="0" x2="1280" y2="0">
+        <stop offset="0%" stop-color="#3cb871" stop-opacity="0.45"/>
+        <stop offset="100%" stop-color="#1a6b3c"/>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <nav class="navbar">
+    <a href="index.html" class="navbar-brand">
+      <svg class="logo-icon" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="21" cy="21" r="21" fill="#f1f5f9"/>
+        <rect x="18" y="8"  width="6" height="26" rx="2" fill="#34a853"/>
+        <rect x="8"  y="18" width="26" height="6"  rx="2" fill="#ea4335"/>
+        <rect x="8"  y="18" width="13" height="6"  rx="2" fill="#4285f4"/>
+        <rect x="18" y="8"  width="6"  height="13" rx="2" fill="#fbbc05"/>
+      </svg>
+      <span class="brand-name">trackit</span>
+    </a>
+    <ul class="navbar-nav">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="patient-portal.html" class="active">Patient Portal</a></li>
+    </ul>
+    <div class="navbar-actions">
+      <a href="login.html" class="btn btn-outline">Doctor Login</a>
+    </div>
+  </nav>
+
+  <main class="portal-wrapper">
+    <div class="portal-stack">
+      <section class="login-card">
+        <div class="login-avatar">
+          <div class="avatar-circle">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+            </svg>
+          </div>
+          <span class="portal-badge">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.08C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            Patient Portal
+          </span>
+          <p class="login-title">View your metrics</p>
+          <p class="login-subtitle">Sign in with your registered email and national ID to see only your own vital records.</p>
+        </div>
+
+        <div class="error-msg" id="portal-error">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span id="portal-error-text">Could not find your record.</span>
+        </div>
+
+        <form id="access-form">
+          <div class="login-field">
+            <label for="email">Email Address</label>
+            <div class="input-with-icon">
+              <span class="icon-left">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+              </span>
+              <input id="email" type="email" class="form-control" placeholder="ada.okafor@example.com" autocomplete="email" required />
+            </div>
+          </div>
+
+          <div class="login-field">
+            <label for="national-id">National ID</label>
+            <div class="input-with-icon">
+              <span class="icon-left">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="16" rx="2"/>
+                  <path d="M7 8h10M7 12h5M7 16h7"/>
+                </svg>
+              </span>
+              <input id="national-id" type="text" class="form-control" placeholder="CMS-001" autocomplete="off" required />
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-login" id="portal-btn">View My Metrics</button>
+        </form>
+      </section>
+
+      <section class="records-shell" id="records-shell">
+        <div class="patient-summary">
+          <h2 id="patient-name">Patient</h2>
+          <p class="muted" id="patient-meta"></p>
+          <div class="quick-stats">
+            <div class="stat"><span>Records</span><strong id="stat-records">0</strong></div>
+            <div class="stat"><span>Latest Status</span><strong id="stat-status">-</strong></div>
+            <div class="stat"><span>Latest SpO2</span><strong id="stat-spo2">-</strong></div>
+          </div>
+        </div>
+        <div class="record-list" id="records"></div>
+      </section>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/api.js"></script>
+  <script>
+    document.getElementById('access-form').addEventListener('submit', loadPatientPortal);
+
+    async function loadPatientPortal(event) {
+      event.preventDefault();
+
+      const button = document.getElementById('portal-btn');
+      const errorBox = document.getElementById('portal-error');
+      const errorText = document.getElementById('portal-error-text');
+
+      const payload = {
+        email: document.getElementById('email').value.trim(),
+        nationalId: document.getElementById('national-id').value.trim()
+      };
+
+      if (!payload.email || !payload.nationalId) {
+        errorText.textContent = 'Please enter your email and national ID.';
+        errorBox.classList.add('show');
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = 'Loading metrics...';
+      errorBox.classList.remove('show');
+
+      try {
+        const response = await fetch(`${BASE_URL}/api/public/patient-portal`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          errorText.textContent = data.error || 'Could not find your record.';
+          errorBox.classList.add('show');
+          return;
+        }
+
+        renderPortal(data);
+      } catch (error) {
+        errorText.textContent = 'Could not reach the backend. Is it running?';
+        errorBox.classList.add('show');
+      } finally {
+        button.disabled = false;
+        button.textContent = 'View My Metrics';
+      }
+    }
+
+    function renderPortal(data) {
+      const patient = data.patient;
+      const records = data.records || [];
+      const latest = records[0];
+
+      document.getElementById('records-shell').classList.add('show');
+      document.getElementById('patient-name').textContent = `${patient.firstName} ${patient.lastName}`;
+      document.getElementById('patient-meta').textContent = `${patient.nationalId} | ${patient.email} | ${patient.department || 'General'}`;
+      document.getElementById('stat-records').textContent = records.length;
+      document.getElementById('stat-status').textContent = latest ? latest.status : '-';
+      document.getElementById('stat-spo2').textContent = latest ? formatRange(latest.minSpo2, latest.maxSpo2, '%') : '-';
+
+      const container = document.getElementById('records');
+      if (!records.length) {
+        container.innerHTML = `<div class="empty-state">No uploaded vital records are available for this patient yet.</div>`;
+        return;
+      }
+
+      container.innerHTML = records.map((record) => `
+        <article class="record-card">
+          <div class="record-head">
+            <div>
+              <h3>${escapeHtml(record.diagnosisLabel)}</h3>
+              <p class="muted">${formatDate(record.createdAt)} | ${escapeHtml(record.originalFileName)}</p>
+            </div>
+            ${statusPill(record.status)}
+          </div>
+          <div class="vital-grid">
+            <div class="vital"><span>Heart Rate</span><strong>${formatValue(record.heartRateBpm, ' BPM')}</strong></div>
+            <div class="vital"><span>Temperature</span><strong>${formatRange(record.minTemperature, record.maxTemperature, ' C')}</strong></div>
+            <div class="vital"><span>SpO2</span><strong>${formatRange(record.minSpo2, record.maxSpo2, '%')}</strong></div>
+            <div class="vital"><span>Confidence</span><strong>${Math.round((record.confidence || 0) * 100)}%</strong></div>
+          </div>
+          <p class="muted">${escapeHtml(record.classificationExplanation || '')}</p>
+          ${record.doctorNote ? `<p class="muted"><strong>Doctor note:</strong> ${escapeHtml(record.doctorNote)}</p>` : ''}
+          ${record.prescription ? `<p class="muted"><strong>Prescription:</strong> ${escapeHtml(record.prescription)}</p>` : ''}
+        </article>
+      `).join('');
+    }
+
+    function statusPill(status) {
+      const className = status === 'CRITICAL' ? 'status-critical' : status === 'WATCH' ? 'status-watch' : 'status-healthy';
+      return `<span class="status-pill ${className}">${escapeHtml(status || 'UNKNOWN')}</span>`;
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3600);
+    }
+
+    function formatValue(value, suffix = '') {
+      return value === null || value === undefined ? '-' : `${value}${suffix}`;
+    }
+
+    function formatRange(min, max, suffix = '') {
+      if (min === null || min === undefined || max === null || max === undefined) return '-';
+      return min === max ? `${min}${suffix}` : `${min}-${max}${suffix}`;
+    }
+
+    function formatDate(value) {
+      if (!value) return '-';
+      return new Date(value).toLocaleString();
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+  </script>
+</body>
+</html>

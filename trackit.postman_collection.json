@@ -1,0 +1,472 @@
+{
+    "info": {
+        "_postman_id": "8c5b967f-4fd2-4e4f-b67f-442a03cf65d9",
+        "name": "TrackIt API Collection",
+        "description": "Collection of API requests to test the TrackIt application including User Login, Admin/Doctor Patient Registration, Patient Onboarding, and Logout operations.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "1. Login (Super Admin)",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "var jsonData = pm.response.json();",
+                            "if (jsonData.accessToken) {",
+                            "    pm.collectionVariables.set(\"accessToken\", jsonData.accessToken);",
+                            "    console.log(\"Saved accessToken variable: \" + jsonData.accessToken);",
+                            "}"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"email\": \"admin@trackit.com\",\n    \"password\": \"AdminSecurePassword123!\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/login",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "login"
+                    ]
+                },
+                "description": "Authenticate as the default seeded Super Admin user. This request will automatically save the returned JWT token to a collection variable named `accessToken`."
+            },
+            "response": []
+        },
+        {
+            "name": "2. Register Patient (Requires Doctor/Admin Role)",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{accessToken}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"email\": \"jane.doe@example.com\",\n    \"fullName\": \"Jane Doe\",\n    \"nationalID\": \"9876543210\",\n    \"gender\": \"FEMALE\",\n    \"phoneNumber\": \"+1234567890\",\n    \"dob\": \"1995-06-15T00:00:00Z\",\n    \"bloodType\": \"A\",\n    \"genotype\": \"AA\",\n    \"isMarried\": false,\n    \"address\": {\n        \"country\": \"United States\",\n        \"city\": \"New York\",\n        \"state\": \"NY\",\n        \"streetAddress\": \"123 Main Street\",\n        \"zipCode\": \"10001\"\n    }\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/patients/register",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "patients",
+                        "register"
+                    ]
+                },
+                "description": "Registers a new patient. Accessible only by users with DOCTOR or SUPER_ADMIN role. The patient will be created in a PENDING status, and a 6-digit OTP will be printed in the server logs/standard output."
+            },
+            "response": []
+        },
+        {
+            "name": "3. Onboard Patient (Complete Registration with OTP)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"email\": \"jane.doe@example.com\",\n    \"password\": \"JaneSecurePassword123!\",\n    \"otp\": \"CHANGE_ME_TO_OTP_FROM_CONSOLE_LOGS\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/patients/onboard",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "patients",
+                        "onboard"
+                    ]
+                },
+                "description": "Public onboarding route. Validates the OTP token against the stored hash, deletes/invalidates the token, updates the patient's password, and sets their status to ACTIVE."
+            },
+            "response": []
+        },
+        {
+            "name": "4. Login (Newly Onboarded Patient)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"email\": \"jane.doe@example.com\",\n    \"password\": \"JaneSecurePassword123!\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/login",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "login"
+                    ]
+                },
+                "description": "Verify the patient onboarding succeeded by logging in with the newly set password."
+            },
+            "response": []
+        },
+        {
+            "name": "5. Logout",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/logout",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "logout"
+                    ]
+                },
+                "description": "Log out of the platform."
+            },
+            "response": []
+        },
+        {
+            "name": "6. Search Patients (Default Load - Requires Doctor/Admin)",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{accessToken}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/patients",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "patients"
+                    ]
+                },
+                "description": "Loads the 25 most recent patients. Accessible only by users with DOCTOR or SUPER_ADMIN role."
+            },
+            "response": []
+        },
+        {
+            "name": "7. Search Patients with Filters (Requires Doctor/Admin)",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{accessToken}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/patients?firstName=Jane&lastName=Doe&gender=FEMALE",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "patients"
+                    ],
+                    "query": [
+                        {
+                            "key": "firstName",
+                            "value": "Jane"
+                        },
+                        {
+                            "key": "lastName",
+                            "value": "Doe"
+                        },
+                        {
+                            "key": "gender",
+                            "value": "FEMALE"
+                        }
+                    ]
+                },
+                "description": "Searches for patients using filter query parameters (firstName, lastName, dob, nationalID, phoneNumber, gender). Accessible only by users with DOCTOR or SUPER_ADMIN role."
+            },
+            "response": []
+        },
+        {
+            "name": "8. Search Patients (Unauthorized/Forbidden Check)",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/patients",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "patients"
+                    ]
+                },
+                "description": "Attempts to search patients without authentication or with insufficient permissions. Should return 401 Unauthorized or 403 Forbidden."
+            },
+            "response": []
+        },
+        {
+            "name": "Inference Service API",
+            "description": "Endpoints to test the Python Inference Service directly (Port 8001).",
+            "item": [
+                {
+                    "name": "Health Check",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "http://localhost:8001/health",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "8001",
+                            "path": [
+                                "health"
+                            ]
+                        },
+                        "description": "Checks if the inference service is up and the model is loaded."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Happy Path: Both ECG and PPG",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "pm.variables.set('ecg_array', JSON.stringify(new Array(7680).fill(0.123)));",
+                                    "pm.variables.set('ppg_array', JSON.stringify(new Array(1920).fill(0.456)));"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"ecg\": {{ecg_array}},\n    \"ppg\": {{ppg_array}}\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:8001/infer",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "8001",
+                            "path": [
+                                "infer"
+                            ]
+                        },
+                        "description": "Valid request containing both 30 seconds of ECG and 30 seconds of PPG."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Happy Path: ECG Only",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "pm.variables.set('ecg_array', JSON.stringify(new Array(7680).fill(0.123)));"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"ecg\": {{ecg_array}}\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:8001/infer",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "8001",
+                            "path": [
+                                "infer"
+                            ]
+                        },
+                        "description": "Valid request containing only ECG data (supported mode)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Edge Case: Missing Both Signals",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:8001/infer",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "8001",
+                            "path": [
+                                "infer"
+                            ]
+                        },
+                        "description": "Invalid request omitting both signals. Expect 400 Bad Request."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Edge Case: Incorrect ECG Length",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"ecg\": [0.0, 1.0, 2.0]\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:8001/infer",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "8001",
+                            "path": [
+                                "infer"
+                            ]
+                        },
+                        "description": "Invalid request with wrong ECG length. Expect 400 Bad Request."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Edge Case: Incorrect PPG Length",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "pm.variables.set('ecg_array', JSON.stringify(new Array(7680).fill(0.123)));"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"ecg\": {{ecg_array}},\n    \"ppg\": [0.0, 1.0, 2.0]\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:8001/infer",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "8001",
+                            "path": [
+                                "infer"
+                            ]
+                        },
+                        "description": "Invalid request with correct ECG but wrong PPG length. Expect 400 Bad Request."
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:8080/trackit",
+            "type": "string"
+        },
+        {
+            "key": "accessToken",
+            "value": "",
+            "type": "string"
+        }
+    ]
+}

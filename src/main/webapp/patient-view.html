@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trackit – Patient Connection</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-green: #2e9e60;
+      --dark-green: #1a6b3c;
+      --light-green: #d6f0e0;
+      --bg-light: #f3fbf7;
+      --bg-dark-grid: #050b08;
+      --card-border: #e2ede7;
+      --text-main: #1a2e3b;
+      --text-grey: #6b7c85;
+      --alert-red: #c7362a;
+      --alert-red-bg: #ffe4e2;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Navbar styling adjustments */
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 40px;
+      border-bottom: 1.5px solid var(--card-border);
+      background: var(--white);
+      position: fixed;
+      width: 100%;
+      height: 70px;
+      top: 0;
+      z-index: 100;
+    }
+
+    .navbar-nav {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+      margin: 0 auto;
+    }
+
+    .navbar-nav a {
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-grey);
+      position: relative;
+      padding-bottom: 24px;
+    }
+
+    .navbar-nav a.active {
+      color: var(--text-main);
+      font-weight: 700;
+    }
+
+    .navbar-nav a.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 3.5px;
+      background-color: var(--primary-green);
+      border-radius: 2px;
+    }
+
+    .navbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .navbar-actions .admin-email {
+      font-size: 0.85rem;
+      color: var(--text-grey);
+      font-weight: 600;
+    }
+
+    /* Main Dashboard Layout */
+    .dashboard-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 24px;
+      max-width: 1400px;
+      margin: 94px auto 32px;
+      padding: 0 24px;
+    }
+
+    /* Cards generic */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 12px rgba(46, 158, 96, 0.04);
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .sidebar-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .system-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--text-grey);
+      margin-bottom: 20px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--primary-green);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--primary-green);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .form-select, .form-input {
+      width: 100%;
+      padding: 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      background-color: var(--white);
+      outline: none;
+      color: var(--text-main);
+      transition: border-color 0.2s;
+    }
+
+    .form-select:focus, .form-input:focus {
+      border-color: var(--primary-green);
+    }
+
+    /* Autocomplete Dropdown Search */
+    .search-container {
+      position: relative;
+    }
+
+    .search-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 50;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      display: none;
+    }
+
+    .search-item {
+      padding: 10px 12px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .search-item:hover {
+      background-color: var(--bg-light);
+    }
+
+    .btn-connect {
+      width: 100%;
+      background-color: var(--dark-green);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background-color 0.2s;
+      margin-top: 12px;
+    }
+
+    .btn-connect:hover {
+      background-color: #124d2b;
+    }
+
+    /* Recent Connections */
+    .recent-section {
+      margin-top: 16px;
+    }
+
+    .recent-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-grey);
+      margin-bottom: 12px;
+    }
+
+    .recent-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .recent-item {
+      background-color: #fafdfb;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .recent-item:hover {
+      background-color: var(--light-green);
+    }
+
+    .recent-info h4 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 2px;
+    }
+
+    .recent-info p {
+      font-size: 0.75rem;
+      color: var(--text-grey);
+    }
+
+    .recent-time {
+      font-size: 0.75rem;
+      color: var(--text-grey);
+    }
+
+    /* Main Area Container */
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Escalation Banner */
+    .escalation-banner {
+      background-color: var(--alert-red-bg);
+      border: 1.5px solid var(--alert-red);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--alert-red);
+      font-weight: 700;
+      font-size: 0.9rem;
+      display: none;
+      animation: slideDown 0.3s ease-out;
+    }
+
+    .escalation-banner .btn-close {
+      background: none;
+      border: none;
+      color: var(--alert-red);
+      font-size: 1.25rem;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Patient Header */
+    .patient-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: var(--white);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .patient-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .patient-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background-color: #f1f3f2;
+      border: 2px dashed var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .patient-details h2 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .patient-details p {
+      font-size: 0.85rem;
+      color: var(--text-grey);
+    }
+
+    .connection-status {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+    }
+
+    .status-badge-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border: none;
+      color: var(--white);
+      background-color: var(--text-grey);
+      cursor: default;
+    }
+
+    .badge-GREEN { background-color: var(--primary-green); }
+    .badge-YELLOW { background-color: #f39c12; }
+    .badge-RED { background-color: var(--alert-red); }
+
+    .btn-disconnect {
+      background-color: var(--white);
+      color: var(--text-main);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .btn-disconnect:hover {
+      background-color: #f5f7f6;
+    }
+
+    .connected-time {
+      font-size: 0.75rem;
+      color: var(--text-grey);
+    }
+
+    /* Tabs Bar */
+    .tabs-bar {
+      display: flex;
+      gap: 24px;
+      border-bottom: 1.5px solid var(--card-border);
+      padding-bottom: 2px;
+    }
+
+    .tab-item {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-grey);
+      padding-bottom: 8px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .tab-item.active {
+      color: var(--text-main);
+    }
+
+    .tab-item.active::after {
+      content: '';
+      position: absolute;
+      bottom: -3.5px;
+      left: 0;
+      width: 100%;
+      height: 3.5px;
+      background-color: var(--primary-green);
+      border-radius: 2px;
+    }
+
+    /* Main Workspace Grid */
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+    }
+
+    /* ECG Section */
+    .ecg-waveform-card {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .waveform-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .waveform-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .live-dot-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--primary-green);
+      background-color: #eefcf6;
+      padding: 4px 8px;
+      border-radius: 40px;
+    }
+
+    .canvas-container {
+      background-color: var(--bg-dark-grid);
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    canvas {
+      width: 100%;
+      height: 280px;
+      display: block;
+    }
+
+    /* Leads Selector */
+    .leads-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .leads-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-grey);
+    }
+
+    .leads-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .lead-btn {
+      background-color: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-main);
+      transition: all 0.2s;
+    }
+
+    .lead-btn.active {
+      background-color: var(--dark-green);
+      color: var(--white);
+      border-color: var(--dark-green);
+    }
+
+    /* Display Config Options */
+    .display-config-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 4px;
+    }
+
+    .config-dropdowns {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-fullscreen {
+      background-color: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--dark-green);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Vitals Cards Right Column */
+    .vitals-column {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .vitals-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .vitals-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .vital-card {
+      background-color: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      box-shadow: inset 0 0 0 1px transparent;
+      transition: box-shadow 0.2s;
+    }
+
+    .vital-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-grey);
+      margin-bottom: 12px;
+      text-transform: capitalize;
+    }
+
+    .vital-value {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .vital-subtext {
+      font-size: 0.75rem;
+      color: var(--primary-green);
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    .vital-full-width {
+      grid-column: 1 / span 2;
+    }
+
+    /* Session Info Section */
+    .session-info-card {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background-color: var(--white);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .session-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .session-columns {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .session-col {
+      border-right: 1.5px solid var(--card-border);
+      padding-right: 8px;
+    }
+
+    .session-col:last-child {
+      border-right: none;
+    }
+
+    .session-col span {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-grey);
+      margin-bottom: 6px;
+    }
+
+    .session-col strong {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .session-col p {
+      font-size: 0.75rem;
+      color: var(--text-grey);
+      margin-top: 2px;
+    }
+
+    /* Warning Info Banner */
+    .warning-banner {
+      background-color: #ebf7f0;
+      border-radius: 8px;
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: #1a5235;
+      font-weight: 600;
+    }
+
+    .warning-banner a {
+      color: var(--dark-green);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    /* Toast styling */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--text-main);
+      color: var(--white);
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      z-index: 1000;
+      display: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .toast.show {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-brand">
+      <svg class="logo-icon" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="21" cy="21" r="21" fill="#f1f5f9"/>
+        <rect x="18" y="8"  width="6" height="26" rx="2" fill="#34a853"/>
+        <rect x="8"  y="18" width="26" height="6"  rx="2" fill="#ea4335"/>
+        <rect x="8"  y="18" width="13" height="6"  rx="2" fill="#4285f4"/>
+        <rect x="18" y="8"  width="6"  height="13" rx="2" fill="#fbbc05"/>
+      </svg>
+      <span class="brand-name">trackit</span>
+    </a>
+    <ul class="navbar-nav">
+      <li><a href="new-patient.html">New Patient</a></li>
+      <li><a href="find-patient.html">Find Patient</a></li>
+      <li><a href="patient-view.html" class="active">Patient connection</a></li>
+      <li><a href="#">Medication</a></li>
+    </ul>
+    <div class="navbar-actions">
+      <span id="admin-label" class="admin-email"></span>
+      <a href="login.html" id="logout-btn" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.8rem;">Logout</a>
+    </div>
+  </nav>
+
+  <!-- Main Dashboard Container -->
+  <div class="dashboard-layout">
+    
+    <!-- Sidebar: Connect to Patient -->
+    <aside class="sidebar">
+      <div class="card">
+        <h3 class="sidebar-title">Connect to Patient</h3>
+        <div class="system-status">
+          <span class="status-dot"></span>
+          <span>System Status: Online</span>
+        </div>
+
+        <div class="form-group">
+          <label>Connection Type</label>
+          <select class="form-select">
+            <option>Patient Name</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Patient</label>
+          <div class="search-container">
+            <input type="text" id="patient-search" class="form-input" placeholder="Search by name, MRN, or phone..." autocomplete="off" />
+            <div id="search-dropdown" class="search-results"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Telemetry File (CSV)</label>
+          <input type="file" id="telemetry-file" class="form-input" accept=".csv" />
+        </div>
+
+        <button class="btn-connect" id="btn-connect">Connect to patient</button>
+      </div>
+
+      <!-- Recent Connections -->
+      <div class="card recent-section">
+        <div class="recent-header">
+          <!-- Clock Icon -->
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <span>Recent Connections</span>
+        </div>
+        <div class="recent-list">
+          <div class="recent-item" onclick="selectRecentPatient('John Doe', '100054321', '25Y', 'Male', '11/09/2000')">
+            <div class="recent-info">
+              <h4>John Doe</h4>
+              <p>MRN: 100054321</p>
+            </div>
+            <span class="recent-time">2 min ago</span>
+          </div>
+          <div class="recent-item" onclick="selectRecentPatient('Osama Elmahas', '100012345', '32Y', 'Male', '05/12/1994')">
+            <div class="recent-info">
+              <h4>Osama Elmahas</h4>
+              <p>MRN: 100012345</p>
+            </div>
+            <span class="recent-time">18 min ago</span>
+          </div>
+          <div class="recent-item" onclick="selectRecentPatient('Mary Johnson', '100067890', '45Y', 'Female', '22/03/1981')">
+            <div class="recent-info">
+              <h4>Mary Johnson</h4>
+              <p>MRN: 100067890</p>
+            </div>
+            <span class="recent-time">1 hr ago</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- Dismissible Escalation Banner -->
+      <div class="escalation-banner" id="escalation-banner">
+        <span id="escalation-text">🚨 ESCALATION REQUIRED</span>
+        <button class="btn-close" onclick="dismissEscalation()">&times;</button>
+      </div>
+
+      <!-- Patient Header Info Card -->
+      <section class="patient-header">
+        <div class="patient-meta">
+          <div class="patient-avatar">
+            <!-- Avatar Icon or SVG mesh -->
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <div class="patient-details">
+            <h2 id="patient-name-display">No Connected Patient</h2>
+            <p id="patient-sub-display">Please select and connect to a patient on the left panel.</p>
+          </div>
+        </div>
+        <div class="connection-status">
+          <div style="display:flex; gap:10px;">
+            <button class="status-badge-btn" id="status-badge">Disconnected</button>
+            <button class="btn-disconnect" id="btn-disconnect" disabled>Disconnect</button>
+          </div>
+          <span class="connected-time" id="connected-time-label">Not connected</span>
+        </div>
+      </section>
+
+      <!-- Tab Bar Navigation -->
+      <nav class="tabs-bar">
+        <span class="tab-item active">Live Monitor</span>
+        <span class="tab-item">ECG History</span>
+        <span class="tab-item">Vital Signs</span>
+        <span class="tab-item">Patient Info</span>
+        <span class="tab-item">Notes</span>
+      </nav>
+
+      <!-- Workspace Panel Grid -->
+      <div class="workspace-grid">
+        
+        <!-- Left Side: ECG & PPG Waveform Canvas -->
+        <section class="card ecg-waveform-card">
+          <div class="waveform-header">
+            <span class="waveform-title">ECG & PPG Waveforms</span>
+            <div class="live-dot-badge">
+              <span class="status-dot"></span>
+              <span>● Live</span>
+            </div>
+          </div>
+          <div class="canvas-container">
+            <canvas id="live-ecg-canvas"></canvas>
+          </div>
+          <div class="leads-section">
+            <span class="leads-label">Display Leads</span>
+            <div class="leads-row">
+              <button class="lead-btn">I</button>
+              <button class="lead-btn active">II</button>
+              <button class="lead-btn">III</button>
+              <button class="lead-btn">aVR</button>
+              <button class="lead-btn">aVL</button>
+              <button class="lead-btn">aVF</button>
+              <button class="lead-btn">V1</button>
+              <button class="lead-btn">V2</button>
+              <button class="lead-btn">V3</button>
+              <button class="lead-btn">V4</button>
+            </div>
+          </div>
+          <div class="display-config-row">
+            <div class="config-dropdowns">
+              <select class="form-select" style="padding: 6px 12px; font-size: 0.8rem; width: auto;">
+                <option>25 mm/s</option>
+              </select>
+              <select class="form-select" style="padding: 6px 12px; font-size: 0.8rem; width: auto;">
+                <option>10mm/mV</option>
+              </select>
+            </div>
+            <button class="btn-fullscreen">⤢ Full Screen</button>
+          </div>
+        </section>
+
+        <!-- Right Side: Vital Signs & AI Triage Results -->
+        <section class="card vitals-column">
+          <div class="vitals-header">
+            <!-- Heart Icon -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#2e9e60" stroke="#2e9e60">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            <strong>Vital signs</strong>
+          </div>
+          <div class="vitals-grid">
+            <div class="vital-card">
+              <div class="vital-label">Heart Rate (bpm)</div>
+              <div class="vital-value" id="vital-hr">--</div>
+              <div class="vital-subtext" id="rhythm-label">-</div>
+            </div>
+            <div class="vital-card">
+              <div class="vital-label">Respiration (breaths/min)</div>
+              <div class="vital-value" id="vital-resp">12</div>
+            </div>
+            <div class="vital-card">
+              <div class="vital-label">SpO2 (%)</div>
+              <div class="vital-value" id="vital-spo2">--</div>
+            </div>
+            <div class="vital-card">
+              <div class="vital-label">Blood Pressure (mmHg)</div>
+              <div class="vital-value" id="vital-bp" style="font-size: 1.4rem; margin-top: 4px;">107/61</div>
+            </div>
+            <div class="vital-card vital-full-width">
+              <div class="vital-label">Temperature (°C)</div>
+              <div class="vital-value" id="vital-temp">37.0</div>
+            </div>
+          </div>
+
+          <!-- AI Triage Box -->
+          <div style="border-top: 1px solid var(--card-border); padding-top: 14px; margin-top: 4px;">
+            <strong style="display: block; font-size: 0.9rem; margin-bottom: 10px; color: var(--text-main);">AI Triage Results</strong>
+            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.8rem;">
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #f0f3f1; padding-bottom: 4px;">
+                <span style="color: var(--text-grey);">Patient:</span>
+                <strong id="ai-patient-name">-</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #f0f3f1; padding-bottom: 4px;">
+                <span style="color: var(--text-grey);">Severity:</span>
+                <strong id="ai-severity">-</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #f0f3f1; padding-bottom: 4px;">
+                <span style="color: var(--text-grey);">Rhythm Label:</span>
+                <strong id="ai-rhythm">-</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #f0f3f1; padding-bottom: 4px;">
+                <span style="color: var(--text-grey);">Severity Score:</span>
+                <strong id="ai-score">-</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #f0f3f1; padding-bottom: 4px;">
+                <span style="color: var(--text-grey);">Stress Level:</span>
+                <strong id="ai-stress">-</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding-bottom: 2px;">
+                <span style="color: var(--text-grey);">Condition Check:</span>
+                <strong id="ai-status">-</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Signal Display -->
+          <div style="border-top: 1px solid var(--card-border); padding-top: 14px; margin-top: 4px;">
+            <strong style="display: block; font-size: 0.9rem; margin-bottom: 6px; color: var(--text-main);">Incoming Telemetry Stream</strong>
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+              <span>ECG Live: <strong id="stream-ecg-val" style="color: var(--primary-green); font-family: monospace;">-- mV</strong></span>
+              <span>PPG Live: <strong id="stream-ppg-val" style="color: #3498db; font-family: monospace;">-- units</strong></span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Session Information Footer Section -->
+      <section class="session-info-card">
+        <h4 class="session-title">Session Information</h4>
+        <div class="session-columns">
+          <div class="session-col">
+            <span>Device</span>
+            <strong>Wireless ECG Monitor</strong>
+            <p>SN: WECG - 234567</p>
+          </div>
+          <div class="session-col">
+            <span>Signal Quality</span>
+            <strong>Good</strong>
+          </div>
+          <div class="session-col">
+            <span>Battery %</span>
+            <strong>83%</strong>
+          </div>
+          <div class="session-col">
+            <span>Connected Since</span>
+            <strong id="connected-since-time">--</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bottom Info Banner -->
+      <div class="warning-banner">
+        <span>ⓘ Ensure the patient is at rest and the electrodes are properly placed for accurate readings</span>
+        <a href="#">View Setup Guide ⤢</a>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast"></div>
+
+  <script src="js/api.js"></script>
+  <script>
+    // ── Auth guard ────────────────────────────────────────────────
+    requireAuth();
+
+    const adminEmail = getAdminEmail();
+    if (adminEmail) {
+      document.getElementById('admin-label').textContent = adminEmail;
+    }
+
+    // Logout
+    document.getElementById('logout-btn').addEventListener('click', function (e) {
+      e.preventDefault();
+      clearToken();
+      window.location.href = 'login.html';
+    });
+
+    // Vitals and Patient lookup State
+    let allPatients = [];
+    let selectedPatient = null;
+    let ws = null;
+    let ecgInterval = null;
+    let ppgInterval = null;
+
+    // Buffers for scrolling waveform
+    let ecgBuffer = [];
+    let ppgBuffer = [];
+    const maxEcgPoints = 250;
+
+    // Canvas drawing
+    const canvas = document.getElementById('live-ecg-canvas');
+    const ctx = canvas.getContext('2d');
+    let renderFrameId = null;
+    
+    function initCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+    }
+
+    // High performance 60FPS Draw Loop
+    function startRenderLoop() {
+      function render() {
+        drawSignals();
+        renderFrameId = requestAnimationFrame(render);
+      }
+      renderFrameId = requestAnimationFrame(render);
+    }
+
+    function stopRenderLoop() {
+      if (renderFrameId) {
+        cancelAnimationFrame(renderFrameId);
+        renderFrameId = null;
+      }
+    }
+
+    function drawSignals() {
+      // Clear canvas
+      ctx.fillStyle = '#050b08';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Draw grid
+      ctx.strokeStyle = '#0e1f13';
+      ctx.lineWidth = 0.5;
+      const step = 20;
+      for (let x = 0; x < canvas.width; x += step) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < canvas.height; y += step) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+
+      // Middle divider line separating ECG and PPG tracks
+      ctx.strokeStyle = '#152f1e';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(0, canvas.height / 2);
+      ctx.lineTo(canvas.width, canvas.height / 2);
+      ctx.stroke();
+
+      const widthStep = canvas.width / maxEcgPoints;
+
+      // Track 1 (ECG): Top Half
+      if (ecgBuffer.length > 0) {
+        ctx.strokeStyle = '#3eff9e';
+        ctx.lineWidth = 2.0;
+        ctx.beginPath();
+        for (let i = 0; i < ecgBuffer.length; i++) {
+          const x = i * widthStep;
+          const val = ecgBuffer[i];
+          // Scale value and center in top half
+          const y = (canvas.height / 4) - (val * 40);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+
+      // ECG track label
+      ctx.fillStyle = '#3eff9e';
+      ctx.font = '700 10px Inter';
+      ctx.fillText('ECG Channel (256Hz) - Lead II', 12, 20);
+
+      // Track 2 (PPG): Bottom Half
+      if (ppgBuffer.length > 0) {
+        ctx.strokeStyle = '#3498db';
+        ctx.lineWidth = 2.0;
+        ctx.beginPath();
+        for (let i = 0; i < ppgBuffer.length; i++) {
+          const x = i * widthStep;
+          const val = ppgBuffer[i];
+          // Scale value and center in bottom half
+          const y = (3 * canvas.height / 4) - (val * 40);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+
+      // PPG track label
+      ctx.fillStyle = '#3498db';
+      ctx.font = '700 10px Inter';
+      ctx.fillText('PPG Channel (64Hz)', 12, (canvas.height / 2) + 20);
+    }
+
+    // Load patients list on initialization
+    async function loadPatients() {
+      try {
+        const res = await apiFetch('/patients');
+        if (res && res.ok) {
+          allPatients = await res.json();
+          setupAutoComplete();
+        } else {
+          console.error('Failed to load patient records, status:', res ? res.status : 'no response');
+          showToast('Failed to load patient records', 'error');
+        }
+      } catch (err) {
+        console.error('loadPatients network/fetch error:', err);
+        showToast('Could not fetch patients list.', 'error');
+      }
+    }
+
+    // Auto-complete setup
+    const searchInput = document.getElementById('patient-search');
+    const dropdown = document.getElementById('search-dropdown');
+
+    function setupAutoComplete() {
+      searchInput.addEventListener('input', function() {
+        const val = this.value.trim().toLowerCase();
+        dropdown.innerHTML = '';
+        if (!val) {
+          dropdown.style.display = 'none';
+          return;
+        }
+
+        const filtered = allPatients.filter(p => 
+          p.fullName.toLowerCase().includes(val) || 
+          p.nationalID.includes(val) || 
+          (p.phoneNumber && p.phoneNumber.includes(val))
+        );
+
+        if (filtered.length > 0) {
+          filtered.forEach(p => {
+            const item = document.createElement('div');
+            item.className = 'search-item';
+            item.textContent = `${p.fullName} (MRN: ${p.nationalID})`;
+            item.addEventListener('click', () => {
+              selectPatient(p);
+            });
+            dropdown.appendChild(item);
+          });
+          dropdown.style.display = 'block';
+        } else {
+          dropdown.style.display = 'none';
+        }
+      });
+
+      // Hide dropdown on click outside
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.search-container')) {
+          dropdown.style.display = 'none';
+        }
+      });
+    }
+
+    function selectPatient(patient) {
+      selectedPatient = patient;
+      searchInput.value = patient.fullName;
+      dropdown.style.display = 'none';
+
+      // Estimate age
+      let age = '25Y';
+      let dobFormatted = '11/09/2000';
+      if (patient.dob) {
+        const dob = new Date(patient.dob);
+        dobFormatted = dob.toLocaleDateString('en-GB');
+        const diffMs = Date.now() - dob.getTime();
+        const ageDate = new Date(diffMs);
+        age = Math.abs(ageDate.getUTCFullYear() - 1970) + 'Y';
+      }
+
+      // Store selection details for the connection header
+      selectedPatient.ageStr = age;
+      selectedPatient.dobStr = dobFormatted;
+      selectedPatient.genderStr = patient.gender || 'Male';
+
+      // Populate header preview details
+      document.getElementById('patient-name-display').textContent = patient.fullName;
+      document.getElementById('patient-sub-display').textContent = `MRN: ${patient.nationalID} | ${selectedPatient.genderStr} | ${age} | D.O.B: ${dobFormatted}`;
+      
+      // Update AI Result box with patient name
+      document.getElementById('ai-patient-name').textContent = patient.fullName;
+    }
+
+    function selectRecentPatient(name, mrn, age, gender, dob) {
+      const mockPatient = {
+        fullName: name,
+        nationalID: mrn,
+        gender: gender,
+        dob: new Date(dob.split('/').reverse().join('-'))
+      };
+      selectPatient(mockPatient);
+    }
+
+    // File selection parsing
+    let parsedEcgSamples = [];
+    let parsedPpgSamples = [];
+
+    document.getElementById('telemetry-file').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const text = evt.target.result;
+        parseCSVData(text);
+      };
+      reader.onerror = function(err) {
+        console.error('FileReader telemetry-file error:', err);
+      };
+      reader.readAsText(file);
+    });
+
+    function parseCSVData(csvText) {
+      parsedEcgSamples = [];
+      parsedPpgSamples = [];
+
+      const lines = csvText.split('\n');
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+
+        const parts = line.split(',');
+        if (parts.length < 4) continue;
+
+        const sampleIndex = parseInt(parts[0]);
+        const channel = parts[2].trim().toLowerCase();
+        const value = parseFloat(parts[3]);
+
+        if (channel === 'ecg') {
+          parsedEcgSamples.push({ sampleIndex, value });
+        } else if (channel === 'ppg') {
+          parsedPpgSamples.push({ sampleIndex, value });
+        }
+      }
+
+      showToast(`Parsed CSV: ${parsedEcgSamples.length} ECG, ${parsedPpgSamples.length} PPG samples loaded.`, 'success');
+    }
+
+    // Connect button click
+    document.getElementById('btn-connect').addEventListener('click', () => {
+      if (!selectedPatient) {
+        showToast('Please search and select a patient first.', 'error');
+        return;
+      }
+
+      if (parsedEcgSamples.length === 0 && parsedPpgSamples.length === 0) {
+        showToast('Please select and upload a valid telemetry CSV file.', 'error');
+        return;
+      }
+
+      connectWebSocket();
+    });
+
+    // Disconnect button click
+    document.getElementById('btn-disconnect').addEventListener('click', () => {
+      disconnectSession();
+    });
+
+    function connectWebSocket() {
+      // Connect to ws context path
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${protocol}//${window.location.host}/trackit/ws/ecg-monitor`;
+      
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        showToast('Connected to patient monitor session', 'success');
+        document.getElementById('status-badge').textContent = 'Connected';
+        document.getElementById('status-badge').className = 'status-badge-btn badge-GREEN';
+        document.getElementById('btn-connect').disabled = true;
+        document.getElementById('btn-disconnect').disabled = false;
+        
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('connected-time-label').textContent = `Connected at ${timeStr}`;
+        document.getElementById('connected-since-time').textContent = `${timeStr}`;
+
+        // Reset AI Triage Box
+        document.getElementById('ai-patient-name').textContent = selectedPatient.fullName;
+        document.getElementById('ai-severity').textContent = 'PENDING';
+        document.getElementById('ai-severity').style.color = 'var(--text-grey)';
+        document.getElementById('ai-rhythm').textContent = '-';
+        document.getElementById('ai-score').textContent = '-';
+        document.getElementById('ai-stress').textContent = '-';
+        document.getElementById('ai-status').textContent = 'Acquiring data... (Requires 30s buffer)';
+        document.getElementById('ai-status').style.color = 'var(--text-main)';
+
+        startStreaming();
+      };
+
+      ws.onmessage = (evt) => {
+        try {
+          const msg = JSON.parse(evt.data);
+          if (msg.type === 'triageResult') {
+            updateTriageResult(msg);
+          } else if (msg.type === 'error') {
+            console.error('Server error received from WebSocket:', msg);
+            showToast(`Server error: ${msg.message}`, 'error');
+          }
+        } catch (err) {
+          console.error('Failed to parse WebSocket message JSON:', err, evt.data);
+        }
+      };
+
+      ws.onclose = (evt) => {
+        console.warn('WebSocket connection closed.', evt);
+        cleanupIntervals();
+        stopRenderLoop();
+        document.getElementById('status-badge').textContent = 'Disconnected';
+        document.getElementById('status-badge').className = 'status-badge-btn';
+        document.getElementById('btn-connect').disabled = false;
+        document.getElementById('btn-disconnect').disabled = true;
+        document.getElementById('connected-time-label').textContent = 'Not connected';
+        showToast('Monitoring connection closed', 'error');
+      };
+
+      ws.onerror = (err) => {
+        console.error('WebSocket Error:', err);
+        showToast('WebSocket connection error occurred', 'error');
+      };
+    }
+
+    function startStreaming() {
+      let ecgIndex = 0;
+      let ppgIndex = 0;
+
+      ecgBuffer = [];
+      ppgBuffer = [];
+
+      startRenderLoop();
+
+      // ECG Interval at 256Hz (one message approx every 3.9ms)
+      ecgInterval = setInterval(() => {
+        if (ecgIndex >= parsedEcgSamples.length) {
+          disconnectSession();
+          showToast('ECG sample streaming finished', 'success');
+          return;
+        }
+
+        const sample = parsedEcgSamples[ecgIndex];
+        const dataMsg = {
+          channel: 'ecg',
+          value: sample.value,
+          sampleIndex: sample.sampleIndex
+        };
+
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify(dataMsg));
+        }
+
+        // Add to canvas draw buffer
+        ecgBuffer.push(sample.value);
+        if (ecgBuffer.length > maxEcgPoints) {
+          ecgBuffer.shift();
+        }
+
+        // Display live text value
+        document.getElementById('stream-ecg-val').textContent = sample.value.toFixed(4) + ' mV';
+
+        ecgIndex++;
+      }, 1000 / 256);
+
+      // PPG Interval at 64Hz (one message approx every 15.6ms)
+      ppgInterval = setInterval(() => {
+        if (ppgIndex >= parsedPpgSamples.length) {
+          disconnectSession();
+          showToast('PPG sample streaming finished', 'success');
+          return;
+        }
+
+        const sample = parsedPpgSamples[ppgIndex];
+        const dataMsg = {
+          channel: 'ppg',
+          value: sample.value,
+          sampleIndex: sample.sampleIndex
+        };
+
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify(dataMsg));
+        }
+
+        // Add to canvas draw buffer
+        ppgBuffer.push(sample.value);
+        if (ppgBuffer.length > maxEcgPoints) {
+          ppgBuffer.shift();
+        }
+
+        // Display live text value
+        document.getElementById('stream-ppg-val').textContent = sample.value.toFixed(4) + ' units';
+
+        ppgIndex++;
+      }, 1000 / 64);
+    }
+
+    function updateTriageResult(result) {
+      // Vitals updates
+      if (result.heartRate) {
+        document.getElementById('vital-hr').textContent = Math.round(result.heartRate);
+      }
+      if (result.spo2) {
+        document.getElementById('vital-spo2').textContent = Math.round(result.spo2);
+      }
+      if (result.rhythmLabel) {
+        document.getElementById('rhythm-label').textContent = result.rhythmLabel;
+      }
+
+      // Severity badge colors on patient header
+      const badge = document.getElementById('status-badge');
+      badge.textContent = result.severity;
+      badge.className = `status-badge-btn badge-${result.severity}`;
+
+      // AI Result Box Details
+      const severityEl = document.getElementById('ai-severity');
+      severityEl.textContent = result.severity;
+      if (result.severity === 'GREEN') severityEl.style.color = 'var(--primary-green)';
+      else if (result.severity === 'YELLOW') severityEl.style.color = '#f39c12';
+      else if (result.severity === 'RED') severityEl.style.color = 'var(--alert-red)';
+
+      document.getElementById('ai-rhythm').textContent = result.rhythmLabel;
+      document.getElementById('ai-score').textContent = (result.severityScore * 100).toFixed(2) + '%';
+      document.getElementById('ai-stress').textContent = result.stressLevel;
+      
+      const conditionEl = document.getElementById('ai-status');
+      if (result.severity === 'GREEN') {
+        conditionEl.textContent = 'Stable condition. No anomaly detected.';
+        conditionEl.style.color = 'var(--primary-green)';
+      } else {
+        conditionEl.textContent = `ISSUE DETECTED: ${result.escalationReason || 'Physiological threshold triggered'}`;
+        conditionEl.style.color = 'var(--alert-red)';
+      }
+
+      // Escalation Alert Banner
+      const banner = document.getElementById('escalation-banner');
+      if (result.requiresEscalation) {
+        document.getElementById('escalation-text').innerHTML = `🚨 <strong>ESCALATION REQUIRED:</strong> ${result.escalationReason || 'Abnormal patient readings detected'}`;
+        banner.style.display = 'flex';
+      } else {
+        banner.style.display = 'none';
+      }
+    }
+
+    function dismissEscalation() {
+      document.getElementById('escalation-banner').style.display = 'none';
+    }
+
+    function disconnectSession() {
+      if (ws) {
+        ws.close();
+      }
+      cleanupIntervals();
+      stopRenderLoop();
+    }
+
+    function cleanupIntervals() {
+      if (ecgInterval) {
+        clearInterval(ecgInterval);
+        ecgInterval = null;
+      }
+      if (ppgInterval) {
+        clearInterval(ppgInterval);
+        ppgInterval = null;
+      }
+    }
+
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.style.backgroundColor = type === 'error' ? 'var(--alert-red)' : '#143f2b';
+      toast.classList.add('show');
+      setTimeout(() => { toast.classList.remove('show'); }, 3000);
+    }
+
+    // Initialize layout and patients list on load
+    window.addEventListener('resize', () => {
+      initCanvas();
+      drawGrid();
+    });
+    
+    document.addEventListener("DOMContentLoaded", () => {
+      initCanvas();
+      loadPatients();
+    });
+
+  </script>
+</body>
+</html>

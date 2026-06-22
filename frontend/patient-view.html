@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trackit – Wireless Emergency Telemedicine System</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+   *{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+  }
+  html,
+  body{
+      width:100%;
+      overflow-x:hidden;
+  }
+  img,
+  svg{
+      max-width:100%;
+  }
+
+    /* Light pastel wave – top-right */
+    .wave-light {
+      position: fixed;
+      right: 0;
+      top: 60px;
+      width: 54%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Dark green wave – bottom */
+    .wave-dark {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .hero {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 74px);
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .hero h1 {
+      font-size: 2.9rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      line-height: 1.25;
+      max-width: 700px;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      font-weight: 800;
+    }
+
+    .hero h1 span {
+      color: var(--green-dark);
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--text-mid);
+      max-width: 580px;
+      line-height: 1.65;
+    }
+    /* ==========================
+   NAVBAR
+========================== */
+
+.navbar{
+    position: relative;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 16px;
+    width:100%;
+    box-sizing:border-box;
+    overflow:hidden;
+}
+
+/* Logo */
+
+.navbar-brand{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-shrink:1;
+    min-width:0;
+}
+
+.logo-icon{
+    width:34px;
+    height:34px;
+    flex-shrink:0;
+}
+
+.brand-name{
+    font-size:1.2rem;
+    white-space:nowrap;
+}
+
+/* Desktop links */
+.navbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.navbar-brand{
+    margin-right:auto;
+}
+
+.navbar-actions{
+    margin-left:auto;
+    margin-right:10px;
+}
+
+.navbar-nav{
+    display:flex;
+    gap:24px;
+}
+
+/* Buttons */
+
+.navbar-actions{
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.navbar-actions .btn{
+    padding:8px 12px;
+    font-size:.85rem;
+    white-space:nowrap;
+}
+
+/* Toggle */
+
+.menu-toggle{
+    display:none;
+    border:none;
+    background:none;
+    font-size:1.8rem;
+    cursor:pointer;
+    line-height:1;
+    padding:0;
+    flex-shrink:0;
+}
+
+
+    /* main container */
+    .dashboard-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 28px 28px 40px;
+      position: relative;
+      z-index: 5;
+    }
+
+    /* stats grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 22px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 28px;
+      padding: 20px 20px;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.02);
+      border: 1px solid #eef3f0;
+      transition: all 0.2s;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+      color: #6f8f7a;
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-size: 2.3rem;
+      font-weight: 800;
+      color: #1c3e2e;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+
+    .stat-unit {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #6f8f7a;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .badge-normal {
+      background: #dff0e4;
+      color: #1b6b3c;
+    }
+
+    .badge-warning {
+      background: #fff1db;
+      color: #c97e0a;
+    }
+
+    .badge-critical {
+      background: #ffe4e2;
+      color: #c7362a;
+    }
+
+    /* ECG card */
+    .ecg-card {
+      background: white;
+      border-radius: 32px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+
+    .card-header {
+      padding: 20px 28px 12px 28px;
+      border-bottom: 1px solid #ecf3ef;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .card-header h2 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #1f3f32;
+    }
+
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #2a7f4b;
+      background: #eef9f2;
+      padding: 5px 12px;
+      border-radius: 40px;
+    }
+
+    .blinking-dot {
+      width: 10px;
+      height: 10px;
+      background: #3eff6e;
+      border-radius: 50%;
+      animation: blink 1.2s infinite;
+      box-shadow: 0 0 2px #2ecc71;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .ecg-canvas-wrapper {
+      background: #0a1720;
+      padding: 20px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 260px;
+      display: block;
+      background: #0a1720;
+      border-radius: 20px;
+    }
+
+    .signal-quality {
+      padding: 12px 28px 20px 28px;
+      font-size: 0.75rem;
+      color: #528a6e;
+      border-top: 1px solid #ecf3ef;
+      background: white;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    /* history table */
+    .history-card {
+      background: white;
+      border-radius: 32px;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.03);
+      overflow: hidden;
+    }
+
+    .history-header {
+      padding: 18px 28px 8px 28px;
+      border-bottom: 1px solid #ecf3ef;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .history-header h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #1f3f32;
+    }
+
+    .history-wrapper {
+      overflow-x: auto;
+      padding: 0 20px 20px 20px;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table th {
+      text-align: left;
+      padding: 14px 12px;
+      background: #fafefb;
+      color: #4e7a66;
+      font-weight: 600;
+      font-size: 0.8rem;
+      border-bottom: 2px solid #e4efe8;
+    }
+
+    .data-table td {
+      padding: 12px 12px;
+      border-bottom: 1px solid #edf4ef;
+      font-size: 0.85rem;
+      color: #2c4a3a;
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 0.7rem;
+      color: #7c9b8a;
+      margin-top: 32px;
+      padding-top: 16px;
+      border-top: 1px solid #deeae3;
+    }
+
+    /* responsive */
+    @media (max-width: 750px) {
+      .navbar {
+        flex-direction: column;
+        gap: 12px;
+        padding: 12px 20px;
+      }
+      .navbar-nav {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 18px;
+      }
+      .dashboard-container {
+        padding: 20px;
+      }
+      .stats-grid {
+        gap: 14px;
+      }
+      .stat-value {
+        font-size: 1.8rem;
+      }
+      canvas {
+        height: 200px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .card-header h2 {
+        font-size: 1.1rem;
+      }
+      .live-indicator {
+        font-size: 0.65rem;
+      }
+    }
+/* RESPONSIVE NAVBAR */
+
+@media (max-width:1024px){
+
+ /* Navbar */
+
+  .navbar{
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:12px 15px;
+      overflow:visible;
+  }
+
+  /* Logo */
+
+  .navbar-brand{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-right:auto;
+  }
+
+  .logo-icon{
+      width:32px;
+      height:32px;
+  }
+
+  .brand-name{
+      font-size:1.1rem;
+  }
+
+  /* Hide desktop links */
+
+  .navbar-nav{
+      display:none;
+
+      position:absolute;
+      top: 100%;
+      width:60%;
+      right: 12px;
+      background:#b4f5cf;
+      box-shadow:0 8px 20px rgba(0,0,0,.08);
+      z-index:9999;
+  }
+
+  /* Show menu when JS adds class */
+
+  .navbar-nav.show{
+      display:block !important;
+     border-radius: 20px;
+      
+  }
+
+  .navbar-nav li{
+      list-style:none;
+      /*border-bottom:1px solid #f3f3f3;*/
+  }
+
+  .navbar-nav li a{
+      display:block;
+      width:100%;
+      padding:15px;
+      text-align:center;
+      text-decoration:none;
+  }
+
+  /* Buttons */
+
+  .navbar-actions{
+      display:flex;
+      gap:6px;
+      margin-left:auto;
+      margin-right:10px;
+  }
+
+  .navbar-actions .btn{
+      padding:6px 10px;
+      font-size:.75rem;
+      white-space:nowrap;
+  }
+
+  /* Toggle */
+
+  .menu-toggle{
+      display:block;
+      background:none;
+      border:none;
+      cursor:pointer;
+      font-size:1.6rem;
+      color:#1a6b3c;
+      line-height:1;
+  }
+  }
+
+
+  /* TABLETS*/
+
+  @media (max-width:768px){
+
+    .brand-name{
+      font-size:1rem;
+    }
+
+    .logo-icon{
+      width:28px;
+      height:28px;
+    }
+    .navbar-actions .btn{
+      padding:5px 8px;
+      font-size:.70rem;
+    }
+    .menu-toggle{
+      font-size:1.5rem;
+    }
+   
+
+  }
+
+
+  /*  MOBILE */
+
+  @media (max-width:500px){
+
+  .navbar{
+      padding:10px;
+  }
+
+  .brand-name{
+      font-size:.9rem;
+  }
+
+  .logo-icon{
+      width:26px;
+      height:26px;
+  }
+
+  .navbar-actions{
+      gap:4px;
+      margin-right:6px;
+  }
+
+  .navbar-actions .btn{
+      padding:5px 7px;
+      font-size:.65rem;
+  }
+
+  .menu-toggle{
+      font-size:1.4rem;
+  }
+
+  .hero h1{
+      font-size:2rem;
+      line-height:1.2;
+  }
+
+  .hero p{
+      font-size:.95rem;
+      line-height:1.6;
+  }
+  }
+
+
+  /*  VERY SMALL PHONES */
+
+  @media (max-width:350px){
+
+  .brand-name{
+      font-size:.8rem;
+  }
+
+  .logo-icon{
+      width:22px;
+      height:22px;
+  }
+
+  .navbar-actions .btn{
+      padding:4px 6px;
+      font-size:.58rem;
+  }
+
+  .menu-toggle{
+      font-size:1.2rem;
+  }
+
+  .hero h1{
+      font-size:1.7rem;
+  }
+
+  .hero p{
+      font-size:.85rem;
+  }
+}
+  </style>
+</head>
+<body>
+
+  <!-- Light wave top-right -->
+  <svg class="wave-light" viewBox="0 0 700 560" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M700 0 C600 80, 450 40, 350 130 C250 220, 150 180, 0 260 L0 560 L700 560 Z"
+          fill="#d6f0e0" opacity="0.7"/>
+  </svg>
+
+  <!-- Dark wave bottom -->
+  <svg class="wave-dark" viewBox="0 0 1280 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0 280 C80 230, 200 320, 350 270 C480 225, 560 300, 700 240
+             C840 178, 950 280, 1100 220 C1200 178, 1250 200, 1280 190 
+             L1280 420 L0 420 Z"
+          fill="url(#waveGradDark)"/>
+    <defs>
+      <linearGradient id="waveGradDark" x1="0" y1="0" x2="1280" y2="0">
+        <stop offset="0%" stop-color="#3cb871" stop-opacity="0.45"/>
+        <stop offset="100%" stop-color="#1a6b3c"/>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-brand">
+      <!-- Trackit + icon -->
+      <svg class="logo-icon" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="21" cy="21" r="21" fill="#f1f5f9"/>
+        <!-- Google-colours plus sign -->
+        <rect x="18" y="8"  width="6" height="26" rx="2" fill="#34a853"/>
+        <rect x="8"  y="18" width="26" height="6"  rx="2" fill="#ea4335"/>
+        <rect x="8"  y="18" width="13" height="6"  rx="2" fill="#4285f4"/>
+        <rect x="18" y="8"  width="6"  height="13" rx="2" fill="#fbbc05"/>
+      </svg>
+      <span class="brand-name">trackit</span>
+    </a>
+    <ul class="navbar-nav">
+      <li><a href="new-patient.html">New Patient</a></li>
+      <li><a href="find-patient.html">Find Patient</a></li>
+      <li><a href="#">Patient connection</a></li>
+      <li><a href="#">Medication</a></li>
+    </ul>
+    <div class="navbar-actions">
+      <a href="#" class="btn btn-outline">Create Account</a>
+      <a href="login.html" class="btn btn-primary">Log In</a>
+    </div>
+    <button class="menu-toggle" id="menuToggle">
+      ☰
+    </button>
+  </nav>
+  
+  <!-- main patient dashboard -->
+  <div class="dashboard-container">
+    <!-- Vital stats cards with color-coded health statuses -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">❤️ Heart Rate</div>
+        <div class="stat-value" id="hrValue">78 <span class="stat-unit">bpm</span></div>
+        <div><span class="status-badge badge-normal" id="hrStatus">Normal</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">🫁 Respiration</div>
+        <div class="stat-value" id="respValue">16 <span class="stat-unit">/min</span></div>
+        <div><span class="status-badge badge-normal" id="respStatus">Stable</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">💧 SpO₂</div>
+        <div class="stat-value" id="spo2Value">97 <span class="stat-unit">%</span></div>
+        <div><span class="status-badge badge-normal" id="spo2Status">Good</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">📈 Blood Pressure</div>
+        <div class="stat-value" id="bpValue">118/76</div>
+        <div><span class="status-badge badge-normal" id="bpStatus">Ideal</span></div>
+      </div>
+    </div>
+
+    <!-- Live ECG monitor card -->
+    <div class="ecg-card">
+      <div class="card-header">
+        <h2>📈 Live ECG Waveform</h2>
+        <div class="live-indicator">
+          <span class="blinking-dot"></span>
+          <span>Streaming live</span>
+        </div>
+      </div>
+      <div class="ecg-canvas-wrapper">
+        <canvas id="patientEcgCanvas" width="900" height="260" style="width:100%; height:auto; background:#0a1720; border-radius: 20px;"></canvas>
+      </div>
+      <div class="signal-quality">
+        <span>🟢 Signal quality: Excellent</span>
+        <span>⚡ Lead: II</span>
+        <span>📡 Last update: just now</span>
+      </div>
+    </div>
+
+    <!-- ECG history table -->
+    <div class="history-card">
+      <div class="history-header">
+        <h3>📋 ECG & Vitals History</h3>
+        <span class="status-badge badge-normal">Last 7 days</span>
+      </div>
+      <div class="history-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Heart Rate</th>
+              <th>Rhythm / Notes</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody">
+            <!-- dynamic rows from JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="footer-note">
+      🔒 Your personal health data is encrypted and only shared with your care team.
+    </div>
+  </div>
+
+  <script>
+   
+  </script>
+
+
+
+</body>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+const btn = document.getElementById("menuToggle");
+const nav = document.querySelector(".navbar-nav");
+
+btn.addEventListener("click", () => {
+
+    //console.log("clicked");
+
+    nav.classList.toggle("show");
+
+    btn.textContent =
+        nav.classList.contains("show")
+        ? "✕"
+        : "☰";
+
+});
+
+});
+
+
+// ----------------------------- PATIENT SPECIFIC DATA -----------------------------
+    // Simulated patient data (real-time mutable, color-coded thresholds)
+    let patientData = {
+      hr: 78,          // heart rate bpm
+      resp: 16,        // respiration /min
+      spo2: 97,        // oxygen saturation %
+      bpSys: 118,
+      bpDia: 76,
+      history: [
+        { date: "2025-03-18", hr: 76, rhythm: "Sinus rhythm", status: "normal" },
+        { date: "2025-03-17", hr: 82, rhythm: "Normal sinus", status: "normal" },
+        { date: "2025-03-16", hr: 79, rhythm: "Mild arrhythmia", status: "warning" },
+        { date: "2025-03-15", hr: 74, rhythm: "Regular", status: "normal" },
+        { date: "2025-03-14", hr: 88, rhythm: "Tachycardia (stress)", status: "warning" },
+        { date: "2025-03-13", hr: 71, rhythm: "Normal", status: "normal" }
+      ]
+    };
+
+    // Helper: get color-coded status badge based on vitals
+    function getStatusFromVitals(hr, spo2) {
+      if (hr > 100 || hr < 50 || spo2 < 92) return "critical";
+      if (hr > 90 || spo2 < 95) return "warning";
+      return "normal";
+    }
+
+    // Update UI cards & color badges dynamically
+    function updatePatientVitalsUI() {
+      const hr = patientData.hr;
+      const resp = patientData.resp;
+      const spo2 = patientData.spo2;
+      const bpSys = patientData.bpSys;
+      const bpDia = patientData.bpDia;
+      
+      document.getElementById("hrValue").innerHTML = `${hr} <span class="stat-unit">bpm</span>`;
+      document.getElementById("respValue").innerHTML = `${resp} <span class="stat-unit">/min</span>`;
+      document.getElementById("spo2Value").innerHTML = `${spo2} <span class="stat-unit">%</span>`;
+      document.getElementById("bpValue").innerHTML = `${bpSys}/${bpDia}`;
+      
+      const overallStatus = getStatusFromVitals(hr, spo2);
+      
+      // update each badge with color coding
+      const hrStatusElem = document.getElementById("hrStatus");
+      const respStatusElem = document.getElementById("respStatus");
+      const spo2StatusElem = document.getElementById("spo2Status");
+      const bpStatusElem = document.getElementById("bpStatus");
+      
+      // reset classes
+      [hrStatusElem, respStatusElem, spo2StatusElem, bpStatusElem].forEach(el => {
+        el.classList.remove("badge-normal", "badge-warning", "badge-critical");
+      });
+      
+      // individual thresholds (realistic medical color codes)
+      if (hr > 100) { hrStatusElem.innerText = "⚠️ High"; hrStatusElem.classList.add("badge-warning"); }
+      else if (hr < 55) { hrStatusElem.innerText = "⚠️ Low"; hrStatusElem.classList.add("badge-warning"); }
+      else { hrStatusElem.innerText = "Normal"; hrStatusElem.classList.add("badge-normal"); }
+      
+      if (resp > 22) { respStatusElem.innerText = "Elevated"; respStatusElem.classList.add("badge-warning"); }
+      else if (resp < 10) { respStatusElem.innerText = "Low"; respStatusElem.classList.add("badge-warning"); }
+      else { respStatusElem.innerText = "Stable"; respStatusElem.classList.add("badge-normal"); }
+      
+      if (spo2 <= 90) { spo2StatusElem.innerText = "Critical!"; spo2StatusElem.classList.add("badge-critical"); }
+      else if (spo2 < 94) { spo2StatusElem.innerText = "Monitor"; spo2StatusElem.classList.add("badge-warning"); }
+      else { spo2StatusElem.innerText = "Good"; spo2StatusElem.classList.add("badge-normal"); }
+      
+      if (bpSys > 140 || bpDia > 90) { bpStatusElem.innerText = "Elevated BP"; bpStatusElem.classList.add("badge-warning"); }
+      else if (bpSys < 90 || bpDia < 60) { bpStatusElem.innerText = "Low BP"; bpStatusElem.classList.add("badge-warning"); }
+      else { bpStatusElem.innerText = "Ideal"; bpStatusElem.classList.add("badge-normal"); }
+    }
+    
+    // Render history table (color-coded rows)
+    function renderHistoryTable() {
+      const tbody = document.getElementById("historyTableBody");
+      if (!tbody) return;
+      let html = "";
+      patientData.history.forEach(record => {
+        let statusClass = "badge-normal";
+        let statusText = "Normal";
+        if (record.status === "warning") {
+          statusClass = "badge-warning";
+          statusText = "⚠️ Watch";
+        } else if (record.status === "critical") {
+          statusClass = "badge-critical";
+          statusText = "🔴 Flagged";
+        } else {
+          statusText = "✅ Normal";
+        }
+        // if hr high/low also show dynamic badge
+        if (record.hr > 100) statusText = "⚠️ High rate";
+        if (record.hr < 55) statusText = "⚠️ Low rate";
+        
+        html += `<tr>
+          <td>${record.date}</td>
+          <td>${record.hr} bpm</td>
+          <td>${record.rhythm}</td>
+          <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+        </tr>`;
+      });
+      tbody.innerHTML = html;
+    }
+    
+    // ---- ECG Real-time waveform drawing (patient specific) ----
+    let animationFrameId = null;
+    let timeOffset = 0;
+    
+    // Generate synthetic realistic ECG points with variable amplitude (based on patient stress / status)
+    function generateECGWaveform(offset, amplitudeFactor = 1.0) {
+      const points = [];
+      const segments = 320;
+      for (let i = 0; i <= segments; i++) {
+        let x = i * 2.5;
+        // base sinus + QRS complex simulation
+        let y = 130 + Math.sin(i * 0.22 + offset) * 18;
+        // P wave
+        if ((i % 85) > 15 && (i % 85) < 28) y += 12 * Math.sin((i % 85) * 0.5);
+        // QRS spike
+        if ((i % 85) > 30 && (i % 85) < 44) y += 38 * Math.sin((i % 85) * 0.6) * amplitudeFactor;
+        // T wave
+        if ((i % 85) > 55 && (i % 85) < 75) y += 14 * Math.sin((i % 85) * 0.3);
+        y = Math.min(235, Math.max(30, y));
+        points.push({ x: x, y: y });
+      }
+      return points;
+    }
+    
+    function drawECG(canvasId, patientHR) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      const container = canvas.parentElement;
+      const width = container.clientWidth;
+      const height = 260;
+      canvas.width = width;
+      canvas.height = height;
+      
+      // adjust amplitude based on heart rate or abnormal condition: higher HR might increase amplitude variation
+      let amplitudeFactor = 1.0;
+      if (patientHR > 100) amplitudeFactor = 1.6;
+      else if (patientHR < 60) amplitudeFactor = 0.9;
+      else amplitudeFactor = 1.1;
+      
+      const points = generateECGWaveform(timeOffset, amplitudeFactor);
+      ctx.clearRect(0, 0, width, height);
+      ctx.beginPath();
+      ctx.strokeStyle = "#3eff9e";
+      ctx.lineWidth = 2.2;
+      ctx.shadowBlur = 0;
+      
+      const stepX = width / 320;
+      for (let i = 0; i < points.length; i++) {
+        const px = points[i].x * stepX;
+        const py = (points[i].y / 260) * height;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+      
+      // small grid effect for medical look
+      ctx.beginPath();
+      ctx.strokeStyle = "#2a5f4b";
+      ctx.lineWidth = 0.5;
+      for (let i = 0; i < 6; i++) {
+        ctx.moveTo(i * (width / 6), 0);
+        ctx.lineTo(i * (width / 6), height);
+        ctx.stroke();
+      }
+    }
+    
+    function animateECGLoop() {
+      const hrNow = patientData.hr;
+      drawECG("patientEcgCanvas", hrNow);
+      timeOffset += 0.12;
+      if (timeOffset > Math.PI * 2) timeOffset -= Math.PI * 2;
+      animationFrameId = requestAnimationFrame(animateECGLoop);
+    }
+    
+    // Simulate real-time medical data fluctuation (every 6 seconds, random walk within safe range)
+    let intervalSimulation = null;
+    function startRealTimeSimulation() {
+      if (intervalSimulation) clearInterval(intervalSimulation);
+      intervalSimulation = setInterval(() => {
+        // subtle variations to mimic real patient telemetry
+        let newHr = patientData.hr + (Math.random() - 0.5) * 2.2;
+        newHr = Math.min(135, Math.max(52, newHr));
+        let newResp = patientData.resp + (Math.random() - 0.5) * 1.2;
+        newResp = Math.min(28, Math.max(10, newResp));
+        let newSpo2 = patientData.spo2 + (Math.random() - 0.5) * 0.8;
+        newSpo2 = Math.min(100, Math.max(88, newSpo2));
+        let newBpSys = patientData.bpSys + (Math.random() - 0.5) * 3;
+        newBpSys = Math.min(155, Math.max(95, newBpSys));
+        let newBpDia = patientData.bpDia + (Math.random() - 0.5) * 2;
+        newBpDia = Math.min(98, Math.max(60, newBpDia));
+        
+        patientData.hr = Math.round(newHr);
+        patientData.resp = Math.round(newResp);
+        patientData.spo2 = Math.round(newSpo2);
+        patientData.bpSys = Math.round(newBpSys);
+        patientData.bpDia = Math.round(newBpDia);
+        
+        // if extreme values appear, add to history (simulate new readings)
+        const criticalFlag = (patientData.hr > 115 || patientData.spo2 < 92);
+        if (criticalFlag && Math.random() < 0.2) {
+          // add an alert entry to history table for demonstration
+          const today = new Date().toISOString().slice(0,10);
+          const lastEntry = patientData.history[0];
+          if (lastEntry.date !== today) {
+            patientData.history.unshift({
+              date: today,
+              hr: patientData.hr,
+              rhythm: patientData.hr > 115 ? "Tachycardia alert" : "Desaturation event",
+              status: patientData.hr > 115 ? "critical" : "warning"
+            });
+            if (patientData.history.length > 10) patientData.history.pop();
+            renderHistoryTable();
+          }
+        }
+        
+        updatePatientVitalsUI();
+        // small ui update for live timestamp
+        const signalDiv = document.querySelector(".signal-quality");
+        if (signalDiv) {
+          const now = new Date();
+          const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute:'2-digit', second:'2-digit' });
+          signalDiv.innerHTML = `<span>🟢 Signal: Excellent</span><span>⚡ Lead: II</span><span>📡 Last update: ${timeStr}</span>`;
+        }
+      }, 5000);
+    }
+    
+    // Simulate occasional new real reading into history (for realism) but from doctor? we only show history but we ensure it's interactive.
+    function addDemoHistoryIfNeeded() {
+      // just to show that history gets periodic color coding; 
+      // manually push every 40 seconds random historical style? Not needed, but ensures data looks fresh
+      setInterval(() => {
+        const randomReading = Math.random();
+        if (randomReading > 0.7) {
+          const todayShort = new Date().toISOString().slice(0,10);
+          const newEntry = {
+            date: todayShort,
+            hr: patientData.hr,
+            rhythm: patientData.hr > 95 ? "Elevated rate" : "Sinus rhythm",
+            status: patientData.hr > 100 ? "warning" : "normal"
+          };
+          // avoid duplicate same day
+          if (patientData.history[0]?.date !== todayShort) {
+            patientData.history.unshift(newEntry);
+            if (patientData.history.length > 8) patientData.history.pop();
+            renderHistoryTable();
+          }
+        }
+      }, 18000);
+    }
+    
+    // initial load and start
+    function initPatientDashboard() {
+      updatePatientVitalsUI();
+      renderHistoryTable();
+      animateECGLoop();
+      startRealTimeSimulation();
+      addDemoHistoryIfNeeded();
+    }
+    
+    // handle window resize to redraw ECG canvas correctly
+    window.addEventListener("resize", () => {
+      if (animationFrameId) {
+        // just redraw on next frame
+        drawECG("patientEcgCanvas", patientData.hr);
+      }
+    });
+    
+    initPatientDashboard();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trackit – Wireless Emergency Telemedicine System</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+   *{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+  }
+  html,
+  body{
+      width:100%;
+      overflow-x:hidden;
+  }
+  img,
+  svg{
+      max-width:100%;
+  }
+
+    /* Light pastel wave – top-right */
+    .wave-light {
+      position: fixed;
+      right: 0;
+      top: 60px;
+      width: 54%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Dark green wave – bottom */
+    .wave-dark {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .hero {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 74px);
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .hero h1 {
+      font-size: 2.9rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      line-height: 1.25;
+      max-width: 700px;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      font-weight: 800;
+    }
+
+    .hero h1 span {
+      color: var(--green-dark);
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--text-mid);
+      max-width: 580px;
+      line-height: 1.65;
+    }
+    /* ==========================
+   NAVBAR
+========================== */
+
+.navbar{
+    position: relative;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 16px;
+    width:100%;
+    box-sizing:border-box;
+    overflow:hidden;
+}
+
+/* Logo */
+
+.navbar-brand{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-shrink:1;
+    min-width:0;
+}
+
+.logo-icon{
+    width:34px;
+    height:34px;
+    flex-shrink:0;
+}
+
+.brand-name{
+    font-size:1.2rem;
+    white-space:nowrap;
+}
+
+/* Desktop links */
+.navbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.navbar-brand{
+    margin-right:auto;
+}
+
+.navbar-actions{
+    margin-left:auto;
+    margin-right:10px;
+}
+
+.navbar-nav{
+    display:flex;
+    gap:24px;
+}
+
+/* Buttons */
+
+.navbar-actions{
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.navbar-actions .btn{
+    padding:8px 12px;
+    font-size:.85rem;
+    white-space:nowrap;
+}
+
+/* Toggle */
+
+.menu-toggle{
+    display:none;
+    border:none;
+    background:none;
+    font-size:1.8rem;
+    cursor:pointer;
+    line-height:1;
+    padding:0;
+    flex-shrink:0;
+}
+
+
+    .doctor-badge {
+      background: #1f6e43;
+      color: white;
+      padding: 6px 16px;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    /* decorative waves */
+    .wave-bg {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      opacity: 0.3;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* main container */
+    .doctor-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 28px 28px 40px;
+      position: relative;
+      z-index: 5;
+    }
+
+    /* two-column layout */
+    .doctor-layout {
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+    }
+
+    /* LEFT PANEL */
+    .left-panel {
+      flex: 1.2;
+      min-width: 280px;
+    }
+
+    .right-panel {
+      flex: 2.2;
+      min-width: 320px;
+    }
+
+    /* patient list card */
+    .card {
+      background: white;
+      border-radius: 28px;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.03);
+      margin-bottom: 28px;
+      overflow: hidden;
+      border: 1px solid #eef3f0;
+    }
+
+    .card-header {
+      padding: 18px 24px 12px 24px;
+      border-bottom: 1px solid #ecf3ef;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .card-header h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1f3f32;
+    }
+
+    .card-header span {
+      font-size: 0.7rem;
+      background: #eef5f0;
+      padding: 4px 12px;
+      border-radius: 40px;
+      color: #2a7f4b;
+    }
+
+    .patient-list {
+      max-height: 380px;
+      overflow-y: auto;
+    }
+
+    .patient-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 24px;
+      border-bottom: 1px solid #f0f6f2;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .patient-item:hover {
+      background: #f9fffc;
+    }
+
+    .patient-item.active {
+      background: #e8f3ed;
+      border-left: 4px solid #1f8a4c;
+    }
+
+    .patient-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .patient-name {
+      font-weight: 700;
+      color: #1b3a2e;
+      font-size: 1rem;
+    }
+
+    .patient-mrn {
+      font-size: 0.7rem;
+      color: #7c9b8a;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .health-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .dot-green {
+      background: #2b9348;
+      box-shadow: 0 0 0 2px #d0f0da;
+    }
+
+    .dot-amber {
+      background: #e9b35f;
+      box-shadow: 0 0 0 2px #fff0cf;
+    }
+
+    .dot-red {
+      background: #e05a4f;
+      box-shadow: 0 0 0 2px #ffe0dd;
+    }
+
+    .status-text {
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    /* watchlist special */
+    .watchlist-item {
+      background: #fffbf5;
+      border-left: 3px solid #e9b35f;
+      margin-bottom: 2px;
+    }
+
+    .watchlist-item.critical {
+      border-left-color: #dc4c3a;
+      background: #fff8f7;
+    }
+
+    /* RIGHT PANEL - patient details */
+    .selected-patient-header {
+      padding: 16px 24px;
+      background: linear-gradient(135deg, #f8fbf9, white);
+      border-bottom: 1px solid #e2efe7;
+    }
+
+    .selected-name {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #1c4d3a;
+    }
+
+    .selected-meta {
+      font-size: 0.75rem;
+      color: #6a8f7a;
+      margin-top: 4px;
+    }
+
+    /* ECG canvas */
+    .ecg-container {
+      background: #0a1720;
+      padding: 20px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 210px;
+      display: block;
+      background: #0a1720;
+      border-radius: 18px;
+    }
+
+    .live-badge-sm {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.7rem;
+      background: #1e3a2f;
+      color: #7effa2;
+      padding: 4px 12px;
+      border-radius: 30px;
+    }
+
+    .blinking-dot {
+      width: 8px;
+      height: 8px;
+      background: #3eff6e;
+      border-radius: 50%;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* vitals grid */
+    .vitals-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      padding: 20px 24px;
+      background: #fefefe;
+    }
+
+    .vital-card {
+      background: #f9fdfa;
+      border-radius: 20px;
+      padding: 12px 14px;
+      text-align: center;
+      border: 1px solid #e6f0ea;
+    }
+
+    .vital-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: #6d8e7c;
+      letter-spacing: 0.5px;
+    }
+
+    .vital-value {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #1a4d3a;
+      line-height: 1.2;
+    }
+
+    .vital-unit {
+      font-size: 0.7rem;
+      font-weight: 500;
+    }
+
+    /* buttons & forms */
+    .record-btn {
+      background: #1f8a4c;
+      color: white;
+      border: none;
+      width: calc(100% - 48px);
+      margin: 8px 24px 20px 24px;
+      padding: 12px;
+      border-radius: 40px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .record-btn:hover {
+      background: #0f6e3f;
+      transform: scale(0.98);
+    }
+
+    .clinical-section {
+      padding: 16px 24px 24px 24px;
+      border-top: 1px solid #e9f0eb;
+    }
+
+    .clinical-label {
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: #2c5a4a;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    textarea {
+      width: 100%;
+      border: 1px solid #d4e2d9;
+      border-radius: 20px;
+      padding: 12px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      resize: vertical;
+      background: #fefefb;
+    }
+
+    .prescription-row {
+      display: flex;
+      gap: 12px;
+      margin: 12px 0;
+      flex-wrap: wrap;
+    }
+
+    .prescription-row input {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 40px;
+      border: 1px solid #d0e0d6;
+      font-size: 0.85rem;
+    }
+
+    .small-btn {
+      background: #eef3ef;
+      border: none;
+      padding: 0 20px;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+      color: #1f6e43;
+    }
+
+    .prescription-list {
+      background: #f8fcf9;
+      border-radius: 18px;
+      padding: 12px;
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: #2c5a4a;
+    }
+
+    hr {
+      margin: 12px 0;
+      border-color: #e2ede6;
+    }
+
+    
+/* RESPONSIVE NAVBAR */
+
+@media (max-width:1024px){
+
+ /* Navbar */
+
+  .navbar{
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:12px 15px;
+      overflow:visible;
+  }
+
+  /* Logo */
+
+  .navbar-brand{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-right:auto;
+  }
+
+  .logo-icon{
+      width:32px;
+      height:32px;
+  }
+
+  .brand-name{
+      font-size:1.1rem;
+  }
+
+  /* Hide desktop links */
+
+  .navbar-nav{
+      display:none;
+
+      position:absolute;
+      top: 100%;
+      width:60%;
+      right: 12px;
+      background:#b4f5cf;
+      box-shadow:0 8px 20px rgba(0,0,0,.08);
+      z-index:9999;
+  }
+
+  /* Show menu when JS adds class */
+
+  .navbar-nav.show{
+      display:block !important;
+     border-radius: 20px;
+      
+  }
+
+  .navbar-nav li{
+      list-style:none;
+      /*border-bottom:1px solid #f3f3f3;*/
+  }
+
+  .navbar-nav li a{
+      display:block;
+      width:100%;
+      padding:15px;
+      text-align:center;
+      text-decoration:none;
+  }
+
+  /* Buttons */
+
+  .navbar-actions{
+      display:flex;
+      gap:6px;
+      margin-left:auto;
+      margin-right:10px;
+  }
+
+  .navbar-actions .btn{
+      padding:6px 10px;
+      font-size:.75rem;
+      white-space:nowrap;
+  }
+
+  /* Toggle */
+
+  .menu-toggle{
+      display:block;
+      background:none;
+      border:none;
+      cursor:pointer;
+      font-size:1.6rem;
+      color:#1a6b3c;
+      line-height:1;
+  }
+
+}
+
+@media (max-width: 850px) {
+      .navbar {
+        flex-direction: column;
+        gap: 12px;
+      }
+      .navbar-nav {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .doctor-container {
+        padding: 16px;
+      }
+      .doctor-layout {
+        flex-direction: column;
+      }
+      .vitals-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+ }
+
+
+/* TABLETS*/
+
+@media (max-width:768px){
+
+    .brand-name{
+      font-size:1rem;
+    }
+
+    .logo-icon{
+      width:28px;
+      height:28px;
+    }
+    .navbar-actions .btn{
+      padding:5px 8px;
+      font-size:.70rem;
+    }
+    .menu-toggle{
+      font-size:1.5rem;
+    }
+   
+
+}
+
+
+/*  MOBILE */
+
+@media (max-width:500px){
+
+  .navbar{
+      padding:10px;
+  }
+
+  .brand-name{
+      font-size:.9rem;
+  }
+
+  .logo-icon{
+      width:26px;
+      height:26px;
+  }
+
+  .navbar-actions{
+      gap:4px;
+      margin-right:6px;
+  }
+
+  .navbar-actions .btn{
+      padding:5px 7px;
+      font-size:.65rem;
+  }
+
+  .menu-toggle{
+      font-size:1.4rem;
+  }
+
+  .hero h1{
+      font-size:2rem;
+      line-height:1.2;
+  }
+
+  .hero p{
+      font-size:.95rem;
+      line-height:1.6;
+  }
+}
+
+
+/*  VERY SMALL PHONES */
+
+@media (max-width:350px){
+
+  .brand-name{
+      font-size:.8rem;
+  }
+
+  .logo-icon{
+      width:22px;
+      height:22px;
+  }
+
+  .navbar-actions .btn{
+      padding:4px 6px;
+      font-size:.58rem;
+  }
+
+  .menu-toggle{
+      font-size:1.2rem;
+  }
+
+  .hero h1{
+      font-size:1.7rem;
+  }
+
+  .hero p{
+      font-size:.85rem;
+  }
+}
+  </style>
+</head>
+<body>
+
+  <!-- Light wave top-right -->
+  <svg class="wave-light" viewBox="0 0 700 560" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M700 0 C600 80, 450 40, 350 130 C250 220, 150 180, 0 260 L0 560 L700 560 Z"
+          fill="#d6f0e0" opacity="0.7"/>
+  </svg>
+
+  <!-- Dark wave bottom -->
+  <svg class="wave-dark" viewBox="0 0 1280 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0 280 C80 230, 200 320, 350 270 C480 225, 560 300, 700 240
+             C840 178, 950 280, 1100 220 C1200 178, 1250 200, 1280 190 
+             L1280 420 L0 420 Z"
+          fill="url(#waveGradDark)"/>
+    <defs>
+      <linearGradient id="waveGradDark" x1="0" y1="0" x2="1280" y2="0">
+        <stop offset="0%" stop-color="#3cb871" stop-opacity="0.45"/>
+        <stop offset="100%" stop-color="#1a6b3c"/>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-brand">
+      <!-- Trackit + icon -->
+      <svg class="logo-icon" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="21" cy="21" r="21" fill="#f1f5f9"/>
+        <!-- Google-colours plus sign -->
+        <rect x="18" y="8"  width="6" height="26" rx="2" fill="#34a853"/>
+        <rect x="8"  y="18" width="26" height="6"  rx="2" fill="#ea4335"/>
+        <rect x="8"  y="18" width="13" height="6"  rx="2" fill="#4285f4"/>
+        <rect x="18" y="8"  width="6"  height="13" rx="2" fill="#fbbc05"/>
+      </svg>
+      <span class="brand-name">trackit</span>
+    </a>
+    <ul class="navbar-nav">
+      <li><a href="new-patient.html">New Patient</a></li>
+      <li><a href="find-patient.html">Find Patient</a></li>
+      <li><a href="#">Patient connection</a></li>
+      <li><a href="#">Medication</a></li>
+    </ul>
+    <div class="navbar-actions">
+      <a href="#" class="btn btn-outline">Create Account</a>
+      <a href="login.html" class="btn btn-primary">Log In</a>
+    </div>
+    <button class="menu-toggle" id="menuToggle">
+      ☰
+    </button>
+  </nav>
+  
+<div class="doctor-container">
+  <div class="doctor-layout">
+    <!-- LEFT PANEL: Patient List + Critical Watchlist -->
+    <div class="left-panel">
+      <!-- All patients list (color coded) -->
+      <div class="card">
+        <div class="card-header">
+          <h2>📋 All Patients</h2>
+          <span>Sorted by urgency</span>
+        </div>
+        <div class="patient-list" id="patientListContainer">
+          <!-- dynamic patient list -->
+        </div>
+      </div>
+
+      <!-- Critical watchlist (separate card) -->
+      <div class="card">
+        <div class="card-header">
+          <h2>⚠️ Critical Watchlist</h2>
+          <span>🔴 Needs attention</span>
+        </div>
+        <div class="patient-list" id="watchlistContainer">
+          <!-- dynamic watchlist -->
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: Detailed patient view with ECG, vitals, notes & prescriptions -->
+    <div class="right-panel">
+      <div class="card">
+        <div class="selected-patient-header" id="selectedHeader">
+          <div class="selected-name" id="selectedPatientName">Select a patient</div>
+          <div class="selected-meta" id="selectedPatientMeta">👤 Click on any patient from the list</div>
+        </div>
+
+        <div class="ecg-container">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <div class="live-badge-sm"><span class="blinking-dot"></span> Live ECG stream</div>
+            <span style="color:#5a9c7a; font-size:0.7rem;" id="ecgTimestamp">Real-time</span>
+          </div>
+          <canvas id="doctorEcgCanvas" width="800" height="200" style="width:100%; height:200px;"></canvas>
+        </div>
+
+        <!-- Vital signs cards -->
+        <div class="vitals-grid" id="vitalsGrid">
+          <div class="vital-card"><div class="vital-label">❤️ Heart Rate</div><div class="vital-value" id="displayHr">--</div><div class="vital-unit">bpm</div></div>
+          <div class="vital-card"><div class="vital-label">🫁 Respiration</div><div class="vital-value" id="displayResp">--</div><div class="vital-unit">/min</div></div>
+          <div class="vital-card"><div class="vital-label">💧 SpO₂</div><div class="vital-value" id="DisplaySpo2">--</div><div class="vital-unit">%</div></div>
+          <div class="vital-card"><div class="vital-label">📊 BP</div><div class="vital-value" id="displayBp">--</div><div class="vital-unit">mmHg</div></div>
+        </div>
+
+        <!-- Doctor action: record new measurement -->
+        <button id="recordNewBtn" class="record-btn">➕ Record New Measurement / Vitals</button>
+
+        <!-- Clinical notes & prescriptions side-by-side (inspired by doctor workspace) -->
+        <div class="clinical-section">
+          <label class="clinical-label">📝 Clinical Notes</label>
+          <textarea id="clinicalNotesInput" rows="2" placeholder="Write diagnosis, observations, follow-up plan..."></textarea>
+          
+          <label class="clinical-label" style="margin-top: 14px;">💊 Prescribe Medication</label>
+          <div class="prescription-row">
+            <input type="text" id="medName" placeholder="Medication name">
+            <input type="text" id="medDosage" placeholder="Dosage (e.g., 500mg)">
+            <button id="savePrescriptionBtn" class="small-btn">+ Add Rx</button>
+          </div>
+          <div id="prescriptionsDisplay" class="prescription-list">
+            No active prescriptions
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    // ---------- MOCK PATIENT DATABASE (with color-coded health statuses) ----------
+    const patientsDb = {
+        p1: { 
+        name: "Sarah Johnson", age: 34, mrn: "MRN-1123", 
+        hr: 78, resp: 16, spo2: 97, bpSys: 118, bpDia: 76,
+        status: "normal", notes: "Stable, regular rhythm. Follow-up in 3 months.", 
+        prescriptions: ["Lisinopril 10mg daily"],
+        ecgAmplitude: 1.0
+        },
+        p2: { 
+        name: "Michael Chen", age: 58, mrn: "MRN-2245", 
+        hr: 112, resp: 24, spo2: 89, bpSys: 152, bpDia: 96,
+        status: "critical", notes: "Severe tachycardia, low SpO2. Urgent review needed.", 
+        prescriptions: ["Amiodarone 200mg", "Oxygen therapy PRN"],
+        ecgAmplitude: 1.7
+        },
+        p3: { 
+        name: "Emeka Okafor", age: 45, mrn: "MRN-3367", 
+        hr: 92, resp: 20, spo2: 93, bpSys: 138, bpDia: 88,
+        status: "warning", notes: "Borderline hypertension, occasional PVCs.", 
+        prescriptions: ["Metoprolol 25mg"],
+        ecgAmplitude: 1.3
+        },
+        p4: { 
+        name: "Linda Amadi", age: 29, mrn: "MRN-4489", 
+        hr: 70, resp: 14, spo2: 99, bpSys: 112, bpDia: 68,
+        status: "normal", notes: "Healthy young adult, no concerns.", 
+        prescriptions: [],
+        ecgAmplitude: 0.9
+        },
+        p5: { 
+        name: "Robert O'Connor", age: 67, mrn: "MRN-5512", 
+        hr: 104, resp: 22, spo2: 91, bpSys: 148, bpDia: 92,
+        status: "critical", notes: "Atrial fibrillation, monitor closely.", 
+        prescriptions: ["Digoxin 0.125mg", "Warfarin"],
+        ecgAmplitude: 1.6
+        }
+    };
+
+    let currentPatientId = "p1";   // default selected
+    let ecgAnimationId = null;
+    let timeOffset = 0;
+
+    // Helper: get color dot & label
+    function getStatusStyle(status) {
+        if(status === "critical") return { dot: "dot-red", label: "🔴 Critical", textClass: "critical" };
+        if(status === "warning") return { dot: "dot-amber", label: "🟡 Watch", textClass: "warning" };
+        return { dot: "dot-green", label: "🟢 Stable", textClass: "normal" };
+    }
+
+    // Render patient list and watchlist with color coding
+    function renderPatientLists() {
+        const container = document.getElementById("patientListContainer");
+        const watchlistContainer = document.getElementById("watchlistContainer");
+        if (!container) return;
+        
+        let allHtml = "";
+        let watchHtml = "";
+        
+        for (const [id, p] of Object.entries(patientsDb)) {
+        const style = getStatusStyle(p.status);
+        const activeClass = (currentPatientId === id) ? "active" : "";
+        allHtml += `
+            <div class="patient-item ${activeClass}" data-id="${id}">
+            <div class="patient-info">
+                <div class="patient-name">${p.name} (${p.age}y)</div>
+                <div class="patient-mrn">${p.mrn}</div>
+            </div>
+            <div class="status-indicator">
+                <span class="health-dot ${style.dot}"></span>
+                <span class="status-text">${style.label}</span>
+            </div>
+            </div>
+        `;
+        
+        // for watchlist: only critical & warning patients
+        if (p.status === "critical" || p.status === "warning") {
+            watchHtml += `
+            <div class="patient-item watchlist-item ${p.status === 'critical' ? 'critical' : ''}" data-id="${id}">
+                <div class="patient-info">
+                <div class="patient-name">${p.name}</div>
+                <div class="patient-mrn">${p.mrn} • HR: ${p.hr} bpm | SpO₂: ${p.spo2}%</div>
+                </div>
+                <div class="status-indicator">
+                <span class="health-dot ${style.dot}"></span>
+                <span class="status-text">${p.status === 'critical' ? '🚨 Emergent' : '⚠️ Attention'}</span>
+                </div>
+            </div>
+            `;
+        }
+        }
+        
+        container.innerHTML = allHtml;
+        watchlistContainer.innerHTML = watchHtml || "<div style='padding:20px; text-align:center;'>✅ No critical patients currently</div>";
+        
+        // attach click events
+        document.querySelectorAll("#patientListContainer .patient-item, #watchlistContainer .patient-item").forEach(el => {
+        el.addEventListener("click", (e) => {
+            const pid = el.getAttribute("data-id");
+            if (pid && patientsDb[pid]) {
+            selectPatient(pid);
+            }
+        });
+        });
+    }
+    
+    // Update right panel with selected patient data
+    function selectPatient(patientId) {
+        currentPatientId = patientId;
+        const p = patientsDb[patientId];
+        document.getElementById("selectedPatientName").innerText = p.name;
+        document.getElementById("selectedPatientMeta").innerHTML = `${p.mrn} • Age ${p.age} • Last updated: just now`;
+        document.getElementById("displayHr").innerHTML = p.hr;
+        document.getElementById("displayResp").innerHTML = p.resp;
+        document.getElementById("DisplaySpo2").innerHTML = p.spo2;
+        document.getElementById("displayBp").innerHTML = `${p.bpSys}/${p.bpDia}`;
+        
+        // load clinical notes
+        document.getElementById("clinicalNotesInput").value = p.notes || "";
+        // load prescriptions display
+        updatePrescriptionsUI(patientId);
+        // re-render active highlight in list
+        renderPatientLists();
+        // reset ECG offset for fresh waveform
+        timeOffset = 0;
+    }
+    
+    function updatePrescriptionsUI(pid) {
+        const p = patientsDb[pid];
+        const rxDiv = document.getElementById("prescriptionsDisplay");
+        if (!p.prescriptions || p.prescriptions.length === 0) {
+        rxDiv.innerHTML = "💊 No active prescriptions.";
+        } else {
+        rxDiv.innerHTML = "💊 <strong>Current Rx:</strong><br>• " + p.prescriptions.join("<br>• ");
+        }
+    }
+    
+    // Save notes from textarea
+    function saveCurrentNotes() {
+        if (currentPatientId) {
+        const notes = document.getElementById("clinicalNotesInput").value;
+        patientsDb[currentPatientId].notes = notes;
+        }
+    }
+    
+    // Add prescription
+    function addPrescription() {
+        const med = document.getElementById("medName").value.trim();
+        const dose = document.getElementById("medDosage").value.trim();
+        if (!med && !dose) {
+        alert("Please enter medication name or dosage");
+        return;
+        }
+        const fullRx = `${med} ${dose}`.trim();
+        if (!patientsDb[currentPatientId].prescriptions) patientsDb[currentPatientId].prescriptions = [];
+        patientsDb[currentPatientId].prescriptions.push(fullRx);
+        updatePrescriptionsUI(currentPatientId);
+        document.getElementById("medName").value = "";
+        document.getElementById("medDosage").value = "";
+    }
+    
+    // Record new measurement (doctor input)
+    function recordNewMeasurement() {
+        const p = patientsDb[currentPatientId];
+        const newHr = prompt("Enter new Heart Rate (bpm):", p.hr);
+        const newResp = prompt("Enter Respiration rate (/min):", p.resp);
+        const newSpo2 = prompt("Enter SpO₂ (%):", p.spo2);
+        const newBpSys = prompt("Systolic BP (mmHg):", p.bpSys);
+        const newBpDia = prompt("Diastolic BP (mmHg):", p.bpDia);
+        
+        if (newHr && !isNaN(newHr)) p.hr = parseInt(newHr);
+        if (newResp && !isNaN(newResp)) p.resp = parseInt(newResp);
+        if (newSpo2 && !isNaN(newSpo2)) p.spo2 = parseInt(newSpo2);
+        if (newBpSys && !isNaN(newBpSys)) p.bpSys = parseInt(newBpSys);
+        if (newBpDia && !isNaN(newBpDia)) p.bpDia = parseInt(newBpDia);
+        
+        // auto-update status based on thresholds (color-code logic)
+        if (p.hr > 105 || p.spo2 < 91 || p.bpSys > 150) p.status = "critical";
+        else if (p.hr > 90 || p.spo2 < 94 || p.bpSys > 135) p.status = "warning";
+        else p.status = "normal";
+        
+        // adjust ecg amplitude for visual feedback
+        if (p.status === "critical") p.ecgAmplitude = 1.8;
+        else if (p.status === "warning") p.ecgAmplitude = 1.4;
+        else p.ecgAmplitude = 1.0;
+        
+        selectPatient(currentPatientId);
+        renderPatientLists();  // refresh colors in lists
+    }
+    
+    // ---------- ECG DRAWING (real-time animation, per patient) ----------
+    function generateECGPoints(offset, amplitudeFactor) {
+        const points = [];
+        for (let i = 0; i <= 300; i++) {
+        let y = 100 + Math.sin(i * 0.22 + offset) * 15;
+        // QRS complex simulation
+        if ((i % 80) > 28 && (i % 80) < 44) y += 32 * Math.sin((i % 80) * 0.6) * amplitudeFactor;
+        if ((i % 80) > 55 && (i % 80) < 72) y += 12 * Math.sin((i % 80) * 0.3);
+        y = Math.min(185, Math.max(25, y));
+        points.push({ x: i * 2.2, y: y });
+        }
+        return points;
+    }
+    
+    function drawDoctorECG() {
+        const canvas = document.getElementById("doctorEcgCanvas");
+        if (!canvas) return;
+        const p = patientsDb[currentPatientId];
+        if (!p) return;
+        const ctx = canvas.getContext("2d");
+        const container = canvas.parentElement;
+        const width = container.clientWidth;
+        const height = 200;
+        canvas.width = width;
+        canvas.height = height;
+        
+        const amplitude = p.ecgAmplitude || 1.0;
+        const points = generateECGPoints(timeOffset, amplitude);
+        ctx.clearRect(0, 0, width, height);
+        ctx.beginPath();
+        ctx.strokeStyle = "#4effa2";
+        ctx.lineWidth = 2.2;
+        const stepX = width / 320;
+        for (let i = 0; i < points.length; i++) {
+        const px = points[i].x * stepX;
+        const py = (points[i].y / 210) * height;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+        // update timestamp
+        const now = new Date();
+        document.getElementById("ecgTimestamp").innerHTML = `🕒 ${now.toLocaleTimeString()}`;
+    }
+    
+    function animateECG() {
+        drawDoctorECG();
+        timeOffset += 0.12;
+        if (timeOffset > Math.PI * 2) timeOffset -= Math.PI * 2;
+        ecgAnimationId = requestAnimationFrame(animateECG);
+    }
+    
+    // attach event listeners and init
+    document.getElementById("recordNewBtn")?.addEventListener("click", recordNewMeasurement);
+    document.getElementById("savePrescriptionBtn")?.addEventListener("click", addPrescription);
+    document.getElementById("clinicalNotesInput")?.addEventListener("blur", saveCurrentNotes);
+    
+    // initial load
+    function initDoctorView() {
+        selectPatient("p1");
+        renderPatientLists();
+        animateECG();
+        // simulate live updates (optional telemetry)
+        setInterval(() => {
+        if (currentPatientId) {
+            // subtle realtime variation to mimic continuous monitoring (non-intrusive)
+            const p = patientsDb[currentPatientId];
+            if (p.status !== "critical") {
+            // small drift for realism
+            p.hr = Math.min(130, Math.max(55, p.hr + (Math.random() - 0.5) * 0.6));
+            p.spo2 = Math.min(100, Math.max(88, p.spo2 + (Math.random() - 0.5) * 0.3));
+            p.hr = Math.round(p.hr);
+            p.spo2 = Math.round(p.spo2);
+            document.getElementById("displayHr").innerHTML = p.hr;
+            document.getElementById("DisplaySpo2").innerHTML = p.spo2;
+            }
+        }
+        }, 4800);
+    }
+    
+    initDoctorView();
+    window.addEventListener("resize", () => drawDoctorECG());
+
+
+    document.addEventListener("DOMContentLoaded", () => {
+
+    const btn = document.getElementById("menuToggle");
+    const nav = document.querySelector(".navbar-nav");
+
+    btn.addEventListener("click", () => {
+
+        //console.log("clicked");
+
+        nav.classList.toggle("show");
+
+        btn.textContent =
+            nav.classList.contains("show")
+            ? "✕"
+            : "☰";
+
+    });
+
+    });
+</script>
+
+</body>
+</html>

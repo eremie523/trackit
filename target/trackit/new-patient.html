@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trackit – New Patient</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    body {
+      background: var(--bg);
+    }
+
+    /* Decorative blobs */
+    .blob-light {
+      position: fixed;
+      top: 60px;
+      right: 0;
+      width: 38%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .blob-dark {
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      width: 28%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Main layout ─────────────────────────── */
+    .main-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 28px;
+      max-width: 1160px;
+      margin: 30px auto;
+      margin-top: 90px;
+      padding: 0 28px;
+    }
+
+    /* ── Form sections ───────────────────────── */
+    .form-sections {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .section-card .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px 32px;
+    }
+
+    /*.field-row {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      align-items: center;
+      gap: 8px;
+    }*/
+    .field-row{
+    display:grid;
+    grid-template-columns:140px 1fr;
+    gap:8px;
+}
+.validation-message{
+    grid-column:2;
+    margin-top:-4px;
+}
+
+    .field-row label {
+      font-size: 0.9rem;
+      color: var(--text-mid);
+      white-space: nowrap;
+    }
+
+    /* ── Profile photo card ──────────────────── */
+    .photo-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 18px;
+    }
+
+    .photo-card-heading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .photo-card-heading .cam-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--green-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .photo-card-heading h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .photo-preview {
+      width: 100%;
+      aspect-ratio: 4/3;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      background: repeating-conic-gradient(#e5e7eb 0% 25%, #f9fafb 0% 50%) 0 0 / 20px 20px;
+    }
+
+    .btn-upload {
+      width: 100%;
+      justify-content: center;
+      background: var(--green-dark);
+      color: var(--white);
+      border: none;
+      padding: 13px;
+      font-size: 0.95rem;
+      border-radius: var(--radius-md);
+    }
+
+    /* ── Action buttons ──────────────────────── */
+    .action-row {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      padding: 20px 28px 36px;
+    }
+
+    .btn-clear {
+      background: var(--white);
+      color: var(--text-mid);
+      border: 1.5px solid var(--border);
+      padding: 12px 40px;
+      font-size: 1rem;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .btn-save {
+      background: var(--green-dark);
+      color: var(--white);
+      border: none;
+      padding: 12px 44px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+    /* ── Toast notification ──────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 0.93rem;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.13);
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.35s cubic-bezier(.4,0,.2,1);
+      pointer-events: none;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .toast.success {
+      background: #edfaf3;
+      border: 1.5px solid #34a853;
+      color: #1a6b3c;
+    }
+
+    .toast.error {
+      background: #fef2f2;
+      border: 1.5px solid #fca5a5;
+      color: #dc2626;
+    }
+
+    .btn-save:disabled, .btn-save.loading {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    /* Photo preview with image */
+    .photo-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: var(--radius-md);
+    }
+  
+/* VALIDATION STYLES */
+
+.form-control.error {
+  border: 2px solid #dc2626 !important;
+  background: #fef2f2;
+}
+
+.form-control.success {
+  border: 2px solid #16a34a !important;
+}
+
+.validation-message {
+  grid-column: 2;
+  font-size: 0.8rem;
+  color: #dc2626;
+  margin-top: -4px;
+  padding-left: 2px;
+  display: none;
+}
+
+.validation-message.show {
+  display: block;
+}
+/* ================= NAVBAR BASE ================= */
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  background: white;
+  z-index: 1000;
+}
+
+.navbar-nav {
+  display: flex;
+  gap: 20px;
+  list-style: none;
+}
+
+.navbar-actions-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* hide toggle on desktop */
+.menu-toggle {
+  display: none;
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+
+
+/* TABLETS */
+@media (max-width: 1024px) {
+
+  .main-grid {
+    grid-template-columns: 1fr;
+    margin-top: 90px;
+  }
+
+  .photo-card {
+    max-width: 450px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .section-card .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  
+}
+
+
+/*  MOBILE */
+@media (max-width: 768px) {
+
+  .main-grid {
+    padding: 0 15px;
+    margin: 20px auto;
+    margin-top: 90px;
+  }
+
+  .section-card {
+    padding: 16px;
+  }
+
+  .field-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .field-row label {
+    margin-bottom: 4px;
+  }
+
+  .validation-message {
+    grid-column: 1;
+    padding-left: 0;
+  }
+
+  .action-row {
+    flex-direction: column;
+    padding: 20px 15px 30px;
+  }
+
+  .btn-save,
+  .btn-clear {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .section-heading h2 {
+    font-size: 1.1rem;
+  }
+
+  .photo-card {
+    padding: 18px;
+  }
+  .menu-toggle {
+    display: block;
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    z-index: 999;
+  }
+
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    padding: 0 15px;
+  }
+
+  /* BRAND stays left */
+  .navbar-brand {
+    position: absolute;
+    left: 15px;
+  }
+
+  /* CENTER admin email + logout */
+  .navbar-actions-wrapper {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  #logout-btn{
+    font-size: 10px;
+    padding: 10px 15px;
+  }
+
+  .navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  #admin-label {
+    font-size: 0.8rem;
+    color: #444;
+    white-space: nowrap;
+  }
+
+  /* HAMBURGER RIGHT */
+  .menu-toggle {
+    display: block;
+    position: fixed;
+    left: 300px;
+    top: 5px;
+    font-size: 24px;
+  }
+
+  
+
+  /* DROPDOWN MENU */
+  .navbar-nav {
+    display: none;
+    position: absolute;
+    top: 70px;
+    right:10px ;
+    width: 100%;
+    background: #fff;
+    flex-direction: column;
+    text-align: center;
+    padding: 10px 0;
+    border-radius: 20px;
+    background: #cef1db;
+    /*border-top: 1px solid #ddd;*/
+    z-index: 999;
+    transition: all .7s ease;
+  }
+
+  .navbar-nav.show {
+    display: flex;
+    width: 70%;
+    height: 200px;
+    font-size: 18px;
+    font-weight: bold;
+    gap: 12px;
+    transition: all .7s ease;
+  }             
+  
+}
+@media (max-width: 700px) {
+  .menu-toggle {
+    top: 5px;
+    font-size: 24px;
+    left: 270px;
+
+  }
+}
+@media (max-width: 550px) {
+  .menu-toggle {
+    top: 5px;
+    font-size: 24px;
+    left: 250px;
+
+  }
+}
+
+
+/*  SMALL PHONES */
+@media (max-width: 480px) {
+
+  .navbar {
+    padding: 12px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .navbar-nav {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .navbar-nav li a {
+    font-size: 0.85rem;
+  }
+
+  .brand-name {
+    font-size: 1rem;
+  }
+
+  .section-heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .section-heading h2 {
+    font-size: 1rem;
+  }
+
+  .photo-card-heading h3 {
+    font-size: 0.95rem;
+  }
+
+  .toast {
+    left: 15px;
+    right: 15px;
+    width: auto;
+    bottom: 15px;
+  }
+  .menu-toggle {
+    top: 5px;
+    font-size: 24px;
+    left: 220px;
+
+  }
+
+}
+@media (max-width: 350px){
+  .menu-toggle {
+    top: 5px;
+    font-size: 24px;
+    left: 190px;
+  }
+}
+@media (max-width: 300px){
+  .menu-toggle {
+    top: 5px;
+    font-size: 24px;
+    left: 110px;
+  }
+  .navbar-actions-wrapper {
+    position: absolute;
+    left: 160px;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  #logout-btn{
+    font-size: 10px;
+    padding: 10px 15px;
+  }
+
+  .navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  #admin-label {
+    display: none;
+  }
+}
+  </style>
+</head>
+<body>
+
+  <!-- Decorative -->
+  <svg class="blob-light" viewBox="0 0 500 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M500 0 C400 60, 310 20, 240 90 C170 160, 90 140, 0 200 L0 400 L500 400 Z"
+          fill="#d6f0e0" opacity="0.6"/>
+  </svg>
+  <svg class="blob-dark" viewBox="0 0 360 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M360 380 L0 380 C0 300, 60 260, 120 230 C200 190, 280 240, 360 180 Z"
+          fill="url(#blobGrad)"/>
+    <defs>
+      <linearGradient id="blobGrad" x1="0" y1="180" x2="360" y2="380">
+        <stop offset="0%" stop-color="#3cb871" stop-opacity="0.5"/>
+        <stop offset="100%" stop-color="#1a6b3c"/>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+
+    <a href="index.html" class="navbar-brand">
+      <svg class="logo-icon" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="21" cy="21" r="21" fill="#f1f5f9"/>
+        <rect x="18" y="8"  width="6" height="26" rx="2" fill="#34a853"/>
+        <rect x="8"  y="18" width="26" height="6"  rx="2" fill="#ea4335"/>
+        <rect x="8"  y="18" width="13" height="6"  rx="2" fill="#4285f4"/>
+        <rect x="18" y="8"  width="6"  height="13" rx="2" fill="#fbbc05"/>
+      </svg>
+      <span class="brand-name">trackit</span>
+    </a>
+    <ul class="navbar-nav">
+      <li><a href="new-patient.html" class="active">New Patient</a></li>
+      <li><a href="find-patient.html">Find Patient</a></li>
+      <li><a href="patient-view.html">Patient connection</a></li>
+      <li><a href="#">Medication</a></li>
+    </ul>
+  
+    <div class="navbar-actions-wrapper">
+
+      <div class="navbar-actions">
+        <span id="admin-label"></span>
+        <a href="login.html" id="logout-btn" class="btn btn-outline">Logout</a>
+      </div>
+    
+      <button class="menu-toggle" id="menu-toggle">☰</button>
+    
+    </div>
+    
+  </nav>
+
+  <!-- Main content -->
+  <div class="main-grid">
+
+    <!-- Left: form sections -->
+    <div class="form-sections">
+
+      <!-- Personal Information -->
+      <div>
+        <div class="section-heading">
+          <div class="section-icon">
+            <!-- person icon -->
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+            </svg>
+          </div>
+          <h2>Personal Information</h2>
+        </div>
+
+        <div class="section-card">
+          <div class="form-grid-2">
+
+            <div class="field-row">
+              <label for="national-id">National ID</label>
+              <input type="text" id="national-id" class="form-control" value="11165435916" />
+              <div class="validation-message" id="national-id-error"></div>
+            </div>
+
+            <div class="field-row">
+              <label for="genotype">Genotype</label>
+              <select id="genotype" class="form-control">
+                <option>B+</option>
+                <option>AA</option>
+                <option>AS</option>
+                <option>SS</option>
+              </select>
+            </div>
+
+            <div class="field-row">
+              <label for="gender">Gender</label>
+              <select id="gender" class="form-control">
+                <option>Male</option>
+                <option>Female</option>
+              </select>
+            </div>
+
+            <div class="field-row">
+              <label for="first-name">First Name</label>
+              <input type="text" id="first-name" class="form-control" value="John" />
+              <div class="validation-message" id="first-name-error"></div>
+            </div>
+
+            <div class="field-row">
+              <label for="mobile">Mobile</label>
+              <input type="text" id="mobile" class="form-control" value="09015344428" />
+              <div class="validation-message" id="mobile-error"></div>
+            </div>
+
+            <div class="field-row">
+              <label for="last-name">Last Name</label>
+              <input type="text" id="last-name" class="form-control" value="Doe" />
+              <div class="validation-message" id="last-name-error"></div>
+            </div>
+
+            <div class="field-row">
+              <label for="email">E-mail</label>
+              <input type="email" id="email" class="form-control" value="johndoe@gmail.com" />
+              <div class="validation-message" id="email-error"></div>
+            </div>
+
+            <div class="field-row">
+              <label for="age">Age</label>
+              <input type="number" id="age" class="form-control" value="25" />
+              <div class="validation-message" id="age-error"></div>
+            </div>
+
+            <div class="field-row">
+              <label for="department">Department</label>
+              <input type="text" id="department" class="form-control" value="Orthopedic" />
+              <div class="validation-message" id="department-error"></div>
+            </div>
+
+            <div class="field-row">
+              <label for="dob">Date of Birth</label>
+              <div class="input-icon-wrap">
+                <input type="date" id="dob" class="form-control" value="11-Sep-2000" />
+                <div class="validation-message" id="dob-error"></div>
+              <span class="icon-right">
+                  <!---<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8"  y1="2" x2="8"  y2="6"/>
+                    <line x1="3"  y1="10" x2="21" y2="10"/>
+                  </svg>------->
+                </span>     
+              </div>
+            </div>
+
+            <div class="field-row" style="grid-column: 1;">
+              <label for="marital">Marital Status</label>
+              <select id="marital" class="form-control">
+                <option>Single</option>
+                <option>Married</option>
+                <option>Divorced</option>
+                <option>Widowed</option>
+              </select>
+            </div>
+
+            <div class="field-row" style="grid-column: 1;">
+              <label for="blood-type">Blood Type</label>
+              <select id="blood-type" class="form-control">
+                <option>O-</option>
+                <option>O+</option>
+                <option>A+</option>
+                <option>A-</option>
+                <option>B+</option>
+                <option>B-</option>
+                <option>AB+</option>
+                <option>AB-</option>
+              </select>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Address Information -->
+      <div>
+        <div class="section-heading">
+          <div class="section-icon">
+            <!-- location pin icon -->
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+            </svg>
+          </div>
+          <h2>Address Information</h2>
+        </div>
+
+        <div class="section-card">
+          <div class="form-grid-2">
+
+            <div class="field-row">
+              <label for="country">Country</label>
+              <select id="country" class="form-control">
+                <option>Nigeria</option>
+                <option>Ghana</option>
+              </select>
+            </div>
+
+            <div class="field-row">
+              <label for="zip">Zip Code</label>
+              <input type="text" id="zip" class="form-control" value="100502" />
+              <div class="validation-message" id="zip-error"></div>
+            </div>
+
+            <div class="field-row">
+              <label for="state">State</label>
+              <select id="state" class="form-control">
+                <option>Rivers State</option>
+                <option>Lagos State</option>
+                <option>Abuja</option>
+              </select>
+            </div>
+
+            <div class="field-row">
+              <label for="street">Street</label>
+              <input type="text" id="street" class="form-control" value="10 Haven Avenue" />
+              <div class="validation-message" id="street-error"></div>
+            </div>
+
+            <div class="field-row">
+              <label for="city">City</label>
+              <select id="city" class="form-control">
+                <option>Port Harcourt</option>
+                <option>Lagos</option>
+                <option>Abuja</option>
+              </select>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /form-sections -->
+
+    <!-- Right: profile photo -->
+    <div class="photo-card">
+      <div class="photo-card-heading">
+        <div class="cam-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+            <path d="M12 15.2A3.2 3.2 0 1 0 12 8.8a3.2 3.2 0 0 0 0 6.4z"/>
+            <path d="M9 3L7.17 5H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.17L15 3H9zm3 15a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/>
+          </svg>
+        </div>
+        <h3>Profile photo</h3>
+      </div>
+
+      <div class="photo-preview" id="photo-preview"></div>
+
+      <!-- Hidden file input -->
+      <input type="file" id="photo-input" accept="image/*" style="display:none;" />
+
+      <button class="btn btn-upload" onclick="document.getElementById('photo-input').click()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        Upload Photo
+      </button>
+    </div>
+
+  </div><!-- /main-grid -->
+
+  <!-- Save / Clear actions -->
+  <div class="action-row">
+    <button class="btn-clear" id="clear-btn" onclick="clearForm()">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="3 6 5 6 21 6"/>
+        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+        <path d="M10 11v6M14 11v6"/>
+        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+      </svg>
+      Clear
+    </button>
+    <button class="btn-save" id="save-btn" onclick="savePatient()">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+        <polyline points="17 21 17 13 7 13 7 21"/>
+        <polyline points="7 3 7 8 15 8"/>
+      </svg>
+      Save
+    </button>
+  </div>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast"></div>
+
+  <script src="js/api.js"></script>
+  <script>
+    // ── Auth guard ────────────────────────────────────────────────
+    requireAuth();
+
+    // ── Show admin email in navbar ────────────────────────────────
+    const adminEmail = getAdminEmail();
+    if (adminEmail) {
+      document.getElementById('admin-label').textContent = adminEmail;
+      document.getElementById('logout-btn').style.display = 'inline-flex';
+    }
+
+    // Logout
+    document.getElementById('logout-btn').addEventListener('click', function (e) {
+      e.preventDefault();
+      clearToken();
+      window.location.href = 'login.html';
+    });
+
+    // ── Photo preview ─────────────────────────────────────────────
+    document.getElementById('photo-input').addEventListener('change', function () {
+      const file = this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const preview = document.getElementById('photo-preview');
+        preview.innerHTML = `<img src="${e.target.result}" alt="Preview" />`;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // ── Toast helper ──────────────────────────────────────────────
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `toast ${type} show`;
+      setTimeout(() => { toast.className = 'toast'; }, 4000);
+    }
+
+    // ── Clear form ────────────────────────────────────────────────
+    function clearForm() {
+      document.getElementById('national-id').value = '';
+      document.getElementById('first-name').value = '';
+      document.getElementById('last-name').value = '';
+      document.getElementById('email').value = '';
+      document.getElementById('mobile').value = '';
+      document.getElementById('age').value = '';
+      document.getElementById('department').value = '';
+      document.getElementById('dob').value = '';
+      document.getElementById('zip').value = '';
+      document.getElementById('street').value = '';
+      document.getElementById('photo-input').value = '';
+      document.getElementById('photo-preview').innerHTML = '';
+    }
+
+
+
+
+// VALIDATION SYSTEM
+
+
+function showError(inputId, message) {
+  const input = document.getElementById(inputId);
+  const error = document.getElementById(inputId + '-error');
+
+  input.classList.remove('success');
+  input.classList.add('error');
+
+  error.textContent = message;
+  error.classList.add('show');
+
+  return false;
+}
+
+function showSuccess(inputId) {
+  const input = document.getElementById(inputId);
+  const error = document.getElementById(inputId + '-error');
+
+  input.classList.remove('error');
+  input.classList.add('success');
+
+  error.textContent = '';
+  error.classList.remove('show');
+
+  return true;
+}
+function validateFirstName() {
+  const value = document.getElementById('first-name').value.trim();
+
+  if (value.length < 2) {
+    return showError(
+      'first-name',
+      'First name must be at least 2 characters'
+    );
+  }
+
+  return showSuccess('first-name');
+}
+
+function validateLastName() {
+  const value = document.getElementById('last-name').value.trim();
+
+  if (value.length < 2) {
+    return showError(
+      'last-name',
+      'Last name must be at least 2 characters'
+    );
+  }
+
+  return showSuccess('last-name');
+}
+
+function validateEmail() {
+  const value = document.getElementById('email').value.trim();
+
+  const emailRegex =
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailRegex.test(value)) {
+    return showError(
+      'email',
+      'Enter a valid email address'
+    );
+  }
+
+  return showSuccess('email');
+}
+
+function validateMobile() {
+  const value =
+    document.getElementById('mobile').value.trim();
+
+  if (!/^0\d{10}$/.test(value)) {
+    return showError(
+      'mobile',
+      'Phone number must be 11 digits'
+    );
+  }
+
+  return showSuccess('mobile');
+}
+
+function validateNationalId() {
+  const value =
+    document.getElementById('national-id').value.trim();
+
+  if (value.length < 8) {
+    return showError(
+      'national-id',
+      'National ID is too short'
+    );
+  }
+
+  return showSuccess('national-id');
+}
+
+function validateAge() {
+  const age =
+    parseInt(document.getElementById('age').value);
+
+  if (isNaN(age) || age < 1 || age > 120) {
+    return showError(
+      'age',
+      'Age must be between 1 and 120'
+    );
+  }
+
+  return showSuccess('age');
+}
+
+function validateDepartment() {
+  const value =
+    document.getElementById('department').value.trim();
+
+  if (value.length < 2) {
+    return showError(
+      'department',
+      'Department is required'
+    );
+  }
+
+  return showSuccess('department');
+}
+
+function validateDOB() {
+  const value =
+    document.getElementById('dob').value.trim();
+
+  if (!value) {
+    return showError(
+      'dob',
+      'Date of birth is required'
+    );
+  }
+
+  return showSuccess('dob');
+}
+// real time validation error
+function validateStreet() {
+  const value =
+    document.getElementById('street').value.trim();
+
+  if (value.length < 5) {
+    return showError(
+      'street',
+      'Street address is too short'
+    );
+  }
+
+  return showSuccess('street');
+}
+
+function validateZip() {
+  const value =
+    document.getElementById('zip').value.trim();
+
+  if (!/^\d{5,10}$/.test(value)) {
+    return showError(
+      'zip',
+      'Invalid zip code'
+    );
+  }
+
+  return showSuccess('zip');
+}
+// validation while typing
+document.getElementById('first-name')
+  .addEventListener('input', validateFirstName);
+
+document.getElementById('last-name')
+  .addEventListener('input', validateLastName);
+
+document.getElementById('email')
+  .addEventListener('input', validateEmail);
+
+document.getElementById('mobile')
+  .addEventListener('input', validateMobile);
+
+document.getElementById('national-id')
+  .addEventListener('input', validateNationalId);
+
+document.getElementById('age')
+  .addEventListener('input', validateAge);
+
+document.getElementById('department')
+  .addEventListener('input', validateDepartment);
+
+document.getElementById('dob')
+  .addEventListener('input', validateDOB);
+
+document.getElementById('street')
+  .addEventListener('input', validateStreet);
+
+document.getElementById('zip')
+  .addEventListener('input', validateZip);
+
+
+
+    // ── Save patient ──────────────────────────────────────────────
+    async function savePatient() {
+      const valid =
+      validateFirstName() &&
+      validateLastName() &&
+      validateEmail() &&
+      validateMobile() &&
+      validateNationalId() &&
+      validateAge() &&
+      validateDepartment() &&
+      validateDOB() &&
+      validateStreet() &&
+      validateZip();
+
+    if (!valid) {
+      showToast(
+        'Please correct the highlighted fields.',
+        'error'
+      );
+      return;
+    }
+      const btn = document.getElementById('save-btn');
+      btn.disabled = true;
+      btn.innerHTML = `
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+        </svg>
+        Saving...`;
+
+      // Parse date (dd-Mon-yyyy or yyyy-MM-dd)
+      let dobRaw = document.getElementById('dob').value.trim();
+      let dateOfBirth = null;
+      if (dobRaw) {
+        const parsed = new Date(dobRaw);
+        if (!isNaN(parsed)) {
+          dateOfBirth = parsed.toISOString();
+        }
+      }
+
+      // Map gender safely
+      const genderVal = document.getElementById('gender').value.toUpperCase();
+
+      // Map bloodType safely
+      let bloodTypeVal = document.getElementById('blood-type').value;
+      bloodTypeVal = bloodTypeVal.replace(/[^A-Za-z]/g, '').toUpperCase();
+      if (!['O', 'A', 'B', 'AB'].includes(bloodTypeVal)) {
+        bloodTypeVal = 'O';
+      }
+
+      // Map genotype safely
+      let genotypeVal = document.getElementById('genotype').value.toUpperCase();
+      if (!['AA', 'AS', 'SS'].includes(genotypeVal)) {
+        genotypeVal = 'AA';
+      }
+
+      // Map marital status to boolean
+      const isMarriedVal = document.getElementById('marital').value.toLowerCase() === 'married';
+
+      const payload = {
+        email: document.getElementById('email').value.trim(),
+        fullName: document.getElementById('first-name').value.trim() + ' ' + document.getElementById('last-name').value.trim(),
+        nationalID: document.getElementById('national-id').value.trim(),
+        gender: genderVal,
+        phoneNumber: document.getElementById('mobile').value.trim(),
+        dob: dateOfBirth,
+        bloodType: bloodTypeVal,
+        genotype: genotypeVal,
+        isMarried: isMarriedVal,
+        address: {
+          country: document.getElementById('country').value,
+          city: document.getElementById('city').value,
+          state: document.getElementById('state').value,
+          streetAddress: document.getElementById('street').value.trim(),
+          zipCode: document.getElementById('zip').value.trim()
+        }
+      };
+
+      try {
+        const res = await apiFetch('/patients/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res) return; // apiFetch redirected to login
+
+        let data = {};
+        try {
+          data = await res.json();
+        } catch (e) {
+          // Fallback if response is not JSON
+        }
+
+        if (res.ok) {
+          showToast(`Patient ${data.fullName || 'Record'} saved successfully!`, 'success');
+          clearForm();
+        } else if (res.status === 409) {
+          console.error('savePatient conflict registration error (409):', data);
+          showToast(data.error || 'A patient with this email or national ID already exists.', 'error');
+        } else {
+          console.error('savePatient error response status:', res.status, data);
+          showToast(data.error || `Failed to save patient (Status: ${res.status}). Please check all required fields.`, 'error');
+        }
+      } catch (err) {
+        console.error('savePatient exception:', err);
+        showToast('Could not reach the server. Is the backend running?', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          </svg>
+          Save`;
+      }
+    }
+    // js code for toggle btn 
+    const menuToggle = document.getElementById('menu-toggle');
+const navMenu = document.querySelector('.navbar-nav');
+
+menuToggle.addEventListener('click', () => {
+  navMenu.classList.toggle('show');
+});
+
+// close menu when clicking a link (mobile UX fix)
+document.querySelectorAll('.navbar-nav a').forEach(link => {
+  link.addEventListener('click', () => {
+    navMenu.classList.remove('show');
+  });
+});
+  </script>
+
+</body>
+</html>

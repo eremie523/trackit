@@ -1,0 +1,178 @@
+## Brief for Antigravity: Python FastAPI Inference Service
+
+**Context to give it first:**
+
+> I have a Jupyter notebook (`ecg_wearable_triage.ipynb`) that contains a complete PyTorch ECG/PPG triage model. I need to extract the relevant code from it and build a standalone FastAPI microservice around it. The service is intentionally stateless — one HTTP POST in, one JSON result out. All session state lives in the Java backend that calls this service. This is a demo system, so CPU inference is fine, no GPU needed.
+
+---
+
+### Step 1 — Extract these things from the notebook into standalone `.py` files
+
+Tell Antigravity to read the notebook and extract the following into the file structure below. It should not invent anything — every class and function already exists in the notebook cells.
+
+**Target file structure:**
+```
+inference-service/
+  app/
+    __init__.py          (empty)
+    model.py             — WearableTriageModel architecture
+    signal_processing.py — ECGPreprocessor, PPGPreprocessor, 
+                           FeatureExtractor, SeverityEngine,
+                           generate_ecg, generate_ppg
+    dataset.py           — WearableDataset (synthetic data generator)
+    main.py              — FastAPI app
+  training/
+    __init__.py          (empty)
+    train.py             — training script
+    generate_demo_csv.py — CSV generator for demo files
+  checkpoints/           (empty dir, .gitkeep)
+  demo_data/             (empty dir, .gitkeep)
+  requirements.txt
+```
+
+---
+
+### `app/model.py`
+Extract `WearableTriageModel` and its sub-components (`DepthwiseSeparableConv`, `LightResBlock`, `SignalEncoder`) from the notebook. Also define these constants at the top of the file — they're used everywhere and must be consistent:
+```python
+ECG_FS = 256
+PPG_FS = 64
+WINDOW_SEC = 30
+ECG_LEN = ECG_FS * WINDOW_SEC   # 7680
+PPG_LEN = PPG_FS * WINDOW_SEC   # 1920
+RHYTHM_CLASSES = ['Normal', 'AFib', 'Bradycardia', 'Tachycardia', 'Anomaly']
+STRESS_CLASSES = ['Low', 'Medium', 'High']
+```
+
+The model takes `(ecg, ppg)` as input where both are tensors of shape `(B, 1, ecg_len)` and `(B, 1, ppg_len)` respectively, and returns a dict with keys: `rhythm_logits`, `stress_logits`, `spo2_pred`, `severity_score`.
+
+---
+
+### `app/signal_processing.py`
+Extract the following from the notebook:
+
+- `ECGPreprocessor` — bandpass filter + z-score normalisation. Instantiated once at module level as `ecg_prep`.
+- `PPGPreprocessor` — same pattern for PPG. Instantiated once as `ppg_prep`.
+- `FeatureExtractor` — rule-based HR, HRV RMSSD, SpO2 extraction from PPG peaks. Instantiated once as `feat_ext`.
+- `SeverityEngine` — the main class that wraps the model. Constructor takes `(model, device='cpu')`. Has one public method `evaluate(ecg_raw, ppg_raw)` that: preprocesses raw numpy arrays, runs the model, extracts features, applies physiological hard overrides (critical HR/SpO2 thresholds override model score), and returns a `TriageResult` dataclass.
+- `TriageResult` dataclass — fields: `timestamp`, `severity` (enum: GREEN/YELLOW/RED), `severity_score`, `rhythm_label`, `rhythm_probs`, `heart_rate`, `hrv_rmssd`, `spo2`, `stress_level`, `stress_probs`, `requires_escalation`, `escalation_reason`. Must have a `to_dict()` method since that's what FastAPI serialises.
+- `generate_ecg(rhythm, fs, duration)` — synthetic ECG generator, one of: `'Normal'`, `'AFib'`, `'Bradycardia'`, `'Tachycardia'`, `'Anomaly'`
+- `generate_ppg(hr, spo2, stress, fs, duration)` — synthetic PPG generator
+
+**Important:** `generate_ecg` and `generate_ppg` return **raw, unpreprocessed** arrays. `SeverityEngine.evaluate()` applies preprocessing internally. Don't preprocess in the generators.
+
+---
+
+### `app/dataset.py`
+Extract `WearableDataset` — a `torch.utils.data.Dataset` that generates synthetic ECG/PPG pairs using `generate_ecg` and `generate_ppg`, applies preprocessing via the module-level `ecg_prep`/`ppg_prep` instances, and computes a ground-truth severity score from physiological rules. Returns tensors with keys: `ecg`, `ppg`, `rhythm_label`, `stress_label`, `spo2`, `severity`.
+
+---
+
+### `app/main.py`
+This is the FastAPI service. Keep it simple:
+
+```python
+GET  /health   → {"status": "ok", "model_loaded": true/false}
+POST /infer    → TriageResult as JSON
+```
+
+**`/infer` request body:**
+```json
+{
+  "ecg": [<float>, ...],   // exactly 7680 values, or omit key entirely
+  "ppg": [<float>, ...]    // exactly 1920 values, or omit key entirely
+}
+```
+
+**Rules:**
+- Both fields are optional but at least one must be present — return HTTP 400 if both are absent
+- Validate array lengths exactly (7680 for ECG, 1920 for PPG) — return HTTP 400 with a clear message if wrong
+- Load the model checkpoint once at startup via FastAPI's `@app.on_event('startup')` — if the checkpoint file doesn't exist, raise a `RuntimeError` with a clear message telling the user to run the training script first
+- Checkpoint path: `checkpoints/helixmind_triage.pt` relative to the service root
+- Wrap inference in try/except and return HTTP 500 on failure
+- The response body is exactly `TriageResult.to_dict()` — no wrapper, no nesting
+
+**Tell Antigravity explicitly:** the model is loaded once at startup into a module-level variable, not on every request. CPU only, `torch.no_grad()` wrapping all inference.
+
+---
+
+### `training/train.py`
+Standalone script that trains the model and saves a checkpoint. Tell Antigravity to wire it so it can be run from the `inference-service/` directory as:
+```bash
+python -m training.train
+```
+
+Training config (extract exact values from notebook):
+- 2000 synthetic samples, 80/20 train/val split, seed 42
+- 40 epochs, batch size 64, AdamW optimizer, OneCycleLR scheduler
+- Multi-task loss: `1.5 × rhythm_CE + 1.0 × severity_BCE + 0.8 × stress_CE + 0.5 × spo2_MSE`
+- Save best checkpoint by val loss during training, then at the end save a final checkpoint to `checkpoints/helixmind_triage.pt` as a dict containing: `model_state_dict` plus the constants (`ecg_fs`, `ppg_fs`, `window_sec`, `rhythm_classes`, `stress_classes`) so the checkpoint is self-documenting
+
+---
+
+### `training/generate_demo_csv.py`
+Script to generate demo CSV files for the frontend to upload. Run as:
+```bash
+python -m training.generate_demo_csv
+```
+
+**Output format — long-format CSV, one row per sample:**
+```
+sample_index,time_sec,channel,value
+0,0.0,ecg,0.088823
+1,0.00391,ecg,0.063810
+...
+7680,0.0,ppg,0.412...
+```
+ECG rows first (all of them), then PPG rows. ECG `time_sec = sample_index / 256`, PPG `time_sec = sample_index / 64`.
+
+**Generate these four scenarios** — each is a sequence of 30s segments concatenated, so the rhythm changes mid-file and the demo actually shows the severity tier updating live:
+
+| Filename | Segments |
+|---|---|
+| `normal_steady.csv` | 60s Normal (HR 72, SpO2 98, stress Low) |
+| `afib_episode.csv` | 30s Normal → 60s AFib (HR 115, SpO2 93, stress High) |
+| `bradycardia_critical.csv` | 30s Normal → 45s Bradycardia (HR 38, SpO2 89, stress Medium) |
+| `tachycardia_stress.csv` | 30s Normal → 45s Tachycardia (HR 140, SpO2 95, stress High) |
+
+Output to `demo_data/` directory. Use `numpy.random.seed(7)` for reproducibility.
+
+---
+
+### `requirements.txt`
+```
+torch==2.3.1
+numpy==1.26.4
+scipy==1.13.1
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+pydantic==2.7.4
+```
+
+---
+
+### How to run (tell Antigravity to put this in a `README.md`)
+
+```bash
+# 1. Install dependencies
+pip install -r requirements.txt
+
+# 2. Train the model (~5 min on CPU)
+cd inference-service
+python -m training.train
+
+# 3. Generate demo CSV files
+python -m training.generate_demo_csv
+
+# 4. Start the inference service
+uvicorn app.main:app --host 0.0.0.0 --port 8001
+```
+
+---
+
+### Things to tell Antigravity NOT to do
+- Don't invent model architecture — extract it exactly from the notebook cells
+- Don't add database, auth, or any middleware — this is an internal microservice called only by the Java backend
+- Don't use `async def` for the `/infer` endpoint — PyTorch CPU inference is synchronous and blocking, `async` here would give false concurrency
+- Don't load the model on every request — startup load only
+- Don't add CORS headers — the Java backend calls this service directly, the browser never touches it

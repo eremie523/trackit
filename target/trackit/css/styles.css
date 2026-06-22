@@ -1,0 +1,225 @@
+/* ============================
+   Trackit – Shared Stylesheet
+   ============================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --green-dark:   #1a6b3c;
+  --green-main:   #2e9e60;
+  --green-light:  #d6f0e0;
+  --green-wave1:  #3cb871;
+  --text-dark:    #1a2e3b;
+  --text-mid:     #374151;
+  --text-muted:   #9ca3af;
+  --border:       #d1d5db;
+  --bg:           #f9fafb;
+  --white:        #ffffff;
+  --radius-sm:    6px;
+  --radius-md:    10px;
+  --radius-lg:    16px;
+  --shadow:       0 2px 8px rgba(0,0,0,.08);
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: var(--text-mid);
+  background: var(--white);
+  min-height: 100vh;
+}
+
+/* ── Navbar ─────────────────────────────────────────── */
+.navbar {
+  display: flex;
+  align-items: center;
+  padding: 14px 40px;
+  border-bottom: 1.5px solid var(--border);
+  background: var(--white);
+  position: fixed;
+  width: 100%;
+  z-index: 10;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  margin-right: 40px;
+}
+
+.navbar-brand .logo-icon {
+  width: 42px;
+  height: 42px;
+}
+
+.navbar-brand .brand-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.navbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  list-style: none;
+  flex: 1;
+}
+
+.navbar-nav a {
+  text-decoration: none;
+  font-size: 0.95rem;
+  color: var(--text-mid);
+  padding-bottom: 4px;
+}
+
+.navbar-nav a.active {
+  color: var(--text-dark);
+  font-weight: 600;
+  border-bottom: 2.5px solid var(--green-main);
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+
+/* ── Buttons ─────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  border: 2px solid transparent;
+  transition: opacity .15s;
+}
+
+.btn:hover { opacity: .88; }
+
+.btn-primary {
+  background: var(--green-dark);
+  color: var(--white);
+  border-color: var(--green-dark);
+}
+
+.btn-outline {
+  background: var(--white);
+  color: var(--green-dark);
+  border-color: var(--green-dark);
+}
+
+/* ── Shared decorative blob base ────────────────────── */
+.blob {
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Page wrapper ────────────────────────────────────── */
+.page-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Form primitives ─────────────────────────────────── */
+.form-control {
+  padding: 9px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.93rem;
+  color: var(--text-dark);
+  background: var(--white);
+  outline: none;
+  width: 100%;
+}
+
+.form-control:focus {
+  border-color: var(--green-main);
+}
+
+select.form-control {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 32px;
+  cursor: pointer;
+}
+
+.form-control::placeholder {
+  color: var(--text-muted);
+}
+
+/* calendar icon inside date input */
+.input-icon-wrap {
+  position: relative;
+}
+
+.input-icon-wrap .form-control {
+  padding-right: 36px;
+}
+
+.input-icon-wrap .icon-right {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+/* ── Section card (white bordered box) ───────────────── */
+.section-card {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+}
+
+/* ── Section heading row ─────────────────────────────── */
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.section-heading .section-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--green-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.section-heading .section-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: var(--white);
+}
+
+.section-heading h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+.navbar-nav a .active{
+  border-bottom:none !important;
+  color:var(--text-dark);
+  font-weight:600;
+}
+

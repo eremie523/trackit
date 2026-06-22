@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trackit - Telemedicine ML Dashboard</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    body {
+      background: #f7faf9;
+    }
+
+    .workspace {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      margin-bottom: 22px;
+    }
+
+    .dashboard-header h1 {
+      color: var(--text-dark);
+      font-size: 1.65rem;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    .dashboard-header p {
+      color: #5f6f68;
+      font-size: 0.95rem;
+      max-width: 720px;
+      line-height: 1.55;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 86px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .status-healthy {
+      color: #116334;
+      background: #e3f8eb;
+    }
+
+    .status-watch {
+      color: #7a4b00;
+      background: #fff3cf;
+    }
+
+    .status-critical {
+      color: #991b1b;
+      background: #fee2e2;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--white);
+      border: 1px solid #dce5df;
+      border-radius: 8px;
+      padding: 18px;
+      box-shadow: 0 1px 2px rgba(17, 24, 39, 0.04);
+    }
+
+    .panel h2 {
+      font-size: 1rem;
+      color: var(--text-dark);
+      margin-bottom: 14px;
+    }
+
+    .upload-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.82rem;
+      color: #52635b;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .file-input {
+      width: 100%;
+      border: 1.5px dashed #a8b8ae;
+      border-radius: 8px;
+      padding: 12px;
+      background: #fbfdfc;
+      color: var(--text-mid);
+    }
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-dark {
+      background: #174f36;
+      color: white;
+      border-color: #174f36;
+    }
+
+    .btn-soft {
+      background: #eef7f1;
+      color: #174f36;
+      border-color: #c8dfd0;
+    }
+
+    .btn svg {
+      width: 17px;
+      height: 17px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .metric-card {
+      background: #ffffff;
+      border: 1px solid #dce5df;
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .metric-card span {
+      display: block;
+      color: #65756d;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .metric-card strong {
+      color: var(--text-dark);
+      font-size: 1.45rem;
+    }
+
+    .split-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+      gap: 18px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid #dce5df;
+      border-radius: 8px;
+      background: white;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 780px;
+      font-size: 0.88rem;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #edf2ef;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f1f6f3;
+      color: var(--text-dark);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    tbody tr {
+      cursor: pointer;
+    }
+
+    tbody tr:hover {
+      background: #f8fbf9;
+    }
+
+    .watchlist {
+      display: grid;
+      gap: 10px;
+    }
+
+    .watch-item {
+      border: 1px solid #ead0d0;
+      background: #fff8f8;
+      border-radius: 8px;
+      padding: 12px;
+      display: grid;
+      gap: 5px;
+    }
+
+    .watch-item strong {
+      color: #4b1f1f;
+      font-size: 0.92rem;
+    }
+
+    .muted {
+      color: #6b7b72;
+      font-size: 0.84rem;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .detail-stat {
+      background: #f6faf8;
+      border: 1px solid #dce5df;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .detail-stat span {
+      display: block;
+      font-size: 0.74rem;
+      color: #6b7b72;
+      margin-bottom: 5px;
+      font-weight: 700;
+    }
+
+    .detail-stat strong {
+      color: var(--text-dark);
+      font-size: 0.98rem;
+    }
+
+    #ecg-canvas {
+      display: block;
+      width: 100%;
+      height: 190px;
+      border: 1px solid #dce5df;
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: inset 0 0 0 1px rgba(46, 158, 96, 0.04),
+        0 1px 2px rgba(17, 24, 39, 0.04);
+      margin: 8px 0 14px;
+    }
+
+    .signal-meta {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin: -4px 0 14px;
+    }
+
+    .signal-meta span {
+      display: block;
+      border: 1px solid #dce5df;
+      border-radius: 8px;
+      background: #fbfdfc;
+      padding: 8px 10px;
+      color: #65756d;
+      font-size: 0.74rem;
+      font-weight: 700;
+      min-width: 0;
+    }
+
+    .signal-meta strong {
+      display: block;
+      margin-top: 3px;
+      color: var(--text-dark);
+      font-size: 0.82rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 86px;
+      resize: vertical;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: var(--text-dark);
+    }
+
+    .toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 50;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-weight: 700;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.16);
+      background: #143f2b;
+      color: white;
+      display: none;
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    .empty-state {
+      padding: 18px;
+      color: #6b7b72;
+      background: #f8fbf9;
+      border: 1px dashed #c8d9cf;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 1020px) {
+      .dashboard-grid,
+      .split-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 760px) {
+      .navbar {
+        padding: 12px 16px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .navbar-brand {
+        margin-right: 0;
+      }
+
+      .navbar-nav {
+        order: 3;
+        width: 100%;
+        overflow-x: auto;
+        gap: 18px;
+        padding-bottom: 4px;
+      }
+
+      .navbar-actions {
+        margin-left: 0;
+      }
+
+      .workspace {
+        padding: 18px 14px 28px;
+      }
+
+      .dashboard-header {
+        flex-direction: column;
+      }
+
+      .summary-grid,
+      .detail-grid,
+      .signal-meta {
+        grid-template-columns: 1fr;
+      }
+
+      .button-row .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="navbar-brand">
+      <svg class="logo-icon" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="21" cy="21" r="21" fill="#f1f5f9"/>
+        <rect x="18" y="8"  width="6" height="26" rx="2" fill="#34a853"/>
+        <rect x="8"  y="18" width="26" height="6"  rx="2" fill="#ea4335"/>
+        <rect x="8"  y="18" width="13" height="6"  rx="2" fill="#4285f4"/>
+        <rect x="18" y="8"  width="6"  height="13" rx="2" fill="#fbbc05"/>
+      </svg>
+      <span class="brand-name">trackit</span>
+    </a>
+    <ul class="navbar-nav">
+      <li><a href="new-patient.html">New Patient</a></li>
+      <li><a href="find-patient.html">Find Patient</a></li>
+      <li><a href="telemedicine.html" class="active">ML Dashboard</a></li>
+    </ul>
+    <div class="navbar-actions">
+      <span id="admin-label" class="muted"></span>
+      <a href="login.html" id="logout-btn" class="btn btn-outline">Logout</a>
+    </div>
+  </nav>
+
+  <main class="workspace">
+    <section class="dashboard-header">
+      <div>
+        <h1>Telemedicine ML Dashboard</h1>
+        <p>Upload structured ECG, body temperature, and SpO2 text files, then review patient status, critical watchlist, clinical notes, and prescriptions from one workspace.</p>
+      </div>
+      <span class="status-pill status-healthy" id="api-state">READY</span>
+    </section>
+
+    <section class="summary-grid">
+      <div class="metric-card"><span>Patients</span><strong id="patient-count">0</strong></div>
+      <div class="metric-card"><span>Uploads</span><strong id="record-count">0</strong></div>
+      <div class="metric-card"><span>Watchlist</span><strong id="watch-count">0</strong></div>
+      <div class="metric-card"><span>Healthy</span><strong id="healthy-count">0</strong></div>
+    </section>
+
+    <section class="dashboard-grid">
+      <aside class="panel">
+        <h2>Upload Vital File</h2>
+        <form class="upload-form" id="upload-form">
+          <div class="field">
+            <label for="patient-select">Patient</label>
+            <select id="patient-select" class="form-control" required></select>
+          </div>
+          <div class="field">
+            <label for="vital-file">Vitals text file</label>
+            <input id="vital-file" class="file-input" type="file" accept=".txt,.csv,.tsv,.json,.jsonl,text/plain,text/csv,application/json" required />
+          </div>
+          <div class="button-row">
+            <button class="btn btn-dark" type="submit">
+              <i data-lucide="upload"></i>
+              Classify
+            </button>
+            <button class="btn btn-soft" type="button" id="refresh-btn">
+              <i data-lucide="refresh-cw"></i>
+              Refresh
+            </button>
+          </div>
+        </form>
+      </aside>
+
+      <section class="split-grid">
+        <div class="panel">
+          <h2>Patient Vital Records</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Patient</th>
+                  <th>Status</th>
+                  <th>Diagnosis</th>
+                  <th>HR</th>
+                  <th>Temp</th>
+                  <th>SpO2</th>
+                  <th>Confidence</th>
+                  <th>Uploaded</th>
+                </tr>
+              </thead>
+              <tbody id="records-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Critical Watchlist</h2>
+          <div class="watchlist" id="watchlist"></div>
+        </div>
+      </section>
+    </section>
+
+    <section class="panel" style="margin-top:18px;">
+      <h2 id="detail-title">Selected Record</h2>
+      <div id="detail-empty" class="empty-state">Choose a record from the table to inspect ECG preview, features, notes, and prescription.</div>
+      <div id="detail-content" style="display:none;">
+        <div class="detail-grid">
+          <div class="detail-stat"><span>Diagnosis</span><strong id="detail-diagnosis">-</strong></div>
+          <div class="detail-stat"><span>Status</span><strong id="detail-status">-</strong></div>
+          <div class="detail-stat"><span>Heart Rate</span><strong id="detail-hr">-</strong></div>
+          <div class="detail-stat"><span>R-R Irregularity</span><strong id="detail-rr">-</strong></div>
+          <div class="detail-stat"><span>Temperature Range</span><strong id="detail-temp">-</strong></div>
+          <div class="detail-stat"><span>SpO2 Range</span><strong id="detail-spo2">-</strong></div>
+        </div>
+        <canvas id="ecg-canvas" width="960" height="220"></canvas>
+        <div class="signal-meta" aria-live="polite">
+          <span>Signal source<strong id="signal-source">-</strong></span>
+          <span>ECG samples<strong id="signal-samples">-</strong></span>
+          <span>Sampling rate<strong id="signal-rate">-</strong></span>
+          <span>ECG range<strong id="signal-range">-</strong></span>
+        </div>
+        <p class="muted" id="detail-explanation"></p>
+        <div class="split-grid" style="margin-top:14px;">
+          <div class="field">
+            <label for="doctor-note">Doctor note</label>
+            <textarea id="doctor-note" placeholder="Clinical observation"></textarea>
+          </div>
+          <div class="field">
+            <label for="prescription">Prescription</label>
+            <textarea id="prescription" placeholder="Medication, dose, follow-up"></textarea>
+          </div>
+        </div>
+        <div class="button-row" style="margin-top:12px;">
+          <button class="btn btn-dark" id="save-clinical-btn" type="button">
+            <i data-lucide="save"></i>
+            Save Clinical Update
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="js/api.js"></script>
+  <script>
+    requireAuth();
+
+    const state = {
+      patients: [],
+      records: [],
+      watchlist: [],
+      selectedRecord: null
+    };
+    let ecgAnimationFrameId = null;
+
+    const adminEmail = getAdminEmail();
+    if (adminEmail) {
+      document.getElementById('admin-label').textContent = adminEmail;
+    }
+
+    document.getElementById('logout-btn').addEventListener('click', (event) => {
+      event.preventDefault();
+      clearToken();
+      window.location.href = 'login.html';
+    });
+
+    document.getElementById('refresh-btn').addEventListener('click', loadDashboard);
+    document.getElementById('upload-form').addEventListener('submit', uploadVitals);
+    document.getElementById('save-clinical-btn').addEventListener('click', saveClinicalUpdate);
+
+    loadDashboard();
+
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+
+    async function loadDashboard() {
+      setApiState('LOADING', 'status-watch');
+      try {
+        const [patientsRes, recordsRes, watchRes] = await Promise.all([
+          apiFetch('/api/patients'),
+          apiFetch('/api/vitals'),
+          apiFetch('/api/vitals/watchlist')
+        ]);
+
+        if (!patientsRes || !recordsRes || !watchRes) return;
+
+        state.patients = await patientsRes.json();
+        state.records = await recordsRes.json();
+        state.watchlist = await watchRes.json();
+
+        renderPatients();
+        renderSummary();
+        renderRecords();
+        renderWatchlist();
+        setApiState('READY', 'status-healthy');
+      } catch (error) {
+        setApiState('OFFLINE', 'status-critical');
+        showToast('Could not load dashboard. Check that the backend is running.');
+      }
+    }
+
+    async function uploadVitals(event) {
+      event.preventDefault();
+      const patientId = document.getElementById('patient-select').value;
+      const fileInput = document.getElementById('vital-file');
+      if (!patientId || !fileInput.files.length) {
+        showToast('Choose a patient and a vital file.');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('patientId', patientId);
+      formData.append('file', fileInput.files[0]);
+
+      setApiState('CLASSIFYING', 'status-watch');
+      try {
+        const response = await apiFetch('/api/vitals/upload', {
+          method: 'POST',
+          body: formData
+        });
+        if (!response) return;
+
+        const data = await response.json();
+        if (!response.ok) {
+          showToast(data.error || 'Classification failed.');
+          setApiState('READY', 'status-healthy');
+          return;
+        }
+
+        fileInput.value = '';
+        showToast(`Classified: ${data.diagnosisLabel}`);
+        await loadDashboard();
+        selectRecord(data.id);
+      } catch (error) {
+        setApiState('OFFLINE', 'status-critical');
+        showToast('Could not upload file.');
+      }
+    }
+
+    async function saveClinicalUpdate() {
+      if (!state.selectedRecord) return;
+
+      const payload = {
+        doctorNote: document.getElementById('doctor-note').value,
+        prescription: document.getElementById('prescription').value
+      };
+
+      const response = await apiFetch(`/api/vitals/${state.selectedRecord.id}/clinical`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response) return;
+      const data = await response.json();
+      if (!response.ok) {
+        showToast(data.error || 'Could not save clinical update.');
+        return;
+      }
+
+      showToast('Clinical update saved.');
+      await loadDashboard();
+      selectRecord(data.id);
+    }
+
+    function renderPatients() {
+      const select = document.getElementById('patient-select');
+      select.innerHTML = state.patients
+        .map((patient) => `<option value="${patient.id}">${escapeHtml(patient.firstName)} ${escapeHtml(patient.lastName)} - ${escapeHtml(patient.nationalId)}</option>`)
+        .join('');
+    }
+
+    function renderSummary() {
+      document.getElementById('patient-count').textContent = state.patients.length;
+      document.getElementById('record-count').textContent = state.records.length;
+      document.getElementById('watch-count').textContent = state.watchlist.length;
+      document.getElementById('healthy-count').textContent = state.records.filter((record) => record.status === 'HEALTHY').length;
+    }
+
+    function renderRecords() {
+      const body = document.getElementById('records-body');
+      if (!state.records.length) {
+        body.innerHTML = `<tr><td colspan="8" class="muted">No vital records uploaded yet.</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = state.records.map((record) => `
+        <tr onclick="selectRecord(${record.id})">
+          <td><strong>${escapeHtml(record.patientName)}</strong><br><span class="muted">${escapeHtml(record.patientNationalId)}</span></td>
+          <td>${statusPill(record.status)}</td>
+          <td>${escapeHtml(record.diagnosisLabel)}</td>
+          <td>${formatValue(record.heartRateBpm, ' BPM')}</td>
+          <td>${formatRange(record.minTemperature, record.maxTemperature, ' C')}</td>
+          <td>${formatRange(record.minSpo2, record.maxSpo2, '%')}</td>
+          <td>${Math.round((record.confidence || 0) * 100)}%</td>
+          <td>${formatDate(record.createdAt)}</td>
+        </tr>
+      `).join('');
+    }
+
+    function renderWatchlist() {
+      const list = document.getElementById('watchlist');
+      if (!state.watchlist.length) {
+        list.innerHTML = `<div class="empty-state">No critical or watch records right now.</div>`;
+        return;
+      }
+
+      list.innerHTML = state.watchlist.slice(0, 8).map((record) => `
+        <button class="watch-item" type="button" onclick="selectRecord(${record.id})">
+          <strong>${escapeHtml(record.patientName)} - ${escapeHtml(record.diagnosisLabel)}</strong>
+          <span class="muted">${formatValue(record.heartRateBpm, ' BPM')} | ${formatRange(record.minSpo2, record.maxSpo2, '%')} SpO2 | ${formatDate(record.createdAt)}</span>
+        </button>
+      `).join('');
+    }
+
+    function selectRecord(recordId) {
+      const record = state.records.find((item) => item.id === recordId);
+      if (!record) return;
+
+      state.selectedRecord = record;
+      document.getElementById('detail-empty').style.display = 'none';
+      document.getElementById('detail-content').style.display = 'block';
+      document.getElementById('detail-title').textContent = `${record.patientName} - ${record.originalFileName}`;
+      document.getElementById('detail-diagnosis').textContent = record.diagnosisLabel;
+      document.getElementById('detail-status').innerHTML = statusPill(record.status);
+      document.getElementById('detail-hr').textContent = formatValue(record.heartRateBpm, ' BPM');
+      document.getElementById('detail-rr').textContent = record.rrIrregularity ?? '-';
+      document.getElementById('detail-temp').textContent = formatRange(record.minTemperature, record.maxTemperature, ' C');
+      document.getElementById('detail-spo2').textContent = formatRange(record.minSpo2, record.maxSpo2, '%');
+      document.getElementById('detail-explanation').textContent = record.classificationExplanation || '';
+      document.getElementById('doctor-note').value = record.doctorNote || '';
+      document.getElementById('prescription').value = record.prescription || '';
+      const ecgPoints = parseEcgPreview(record.ecgPreview);
+      renderSignalMeta(record, ecgPoints);
+      drawEcg(record, ecgPoints);
+    }
+
+    function parseEcgPreview(previewText) {
+      try {
+        const parsed = JSON.parse(previewText || '[]');
+        return Array.isArray(parsed)
+          ? parsed.map(Number).filter(Number.isFinite)
+          : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function renderSignalMeta(record, points) {
+      document.getElementById('signal-source').textContent = record.originalFileName || 'Uploaded vital file';
+      document.getElementById('signal-samples').textContent = `${points.length} preview / ${record.sampleCount || '-'} raw`;
+      document.getElementById('signal-rate').textContent = record.samplingRateHz ? `${record.samplingRateHz} Hz` : '-';
+      document.getElementById('signal-range').textContent = formatRange(record.ecgMin, record.ecgMax, ' mV');
+    }
+
+    function drawEcg(record, points) {
+      stopEcgAnimation();
+
+      const canvas = document.getElementById('ecg-canvas');
+      const ctx = canvas.getContext('2d');
+
+      if (points.length < 2) {
+        fitCanvasToDisplay(canvas, ctx);
+        ctx.fillStyle = '#6b7b72';
+        ctx.font = '18px Segoe UI';
+        ctx.fillText('No ECG preview available', 28, 110);
+        return;
+      }
+
+      const min = Math.min(...points);
+      const max = Math.max(...points);
+      const range = max - min || 1;
+      const rawDurationSeconds = record.sampleCount && record.samplingRateHz
+        ? Math.max(1, record.sampleCount / record.samplingRateHz)
+        : 6;
+      const effectivePreviewHz = Math.max(8, points.length / rawDurationSeconds);
+      const visibleSamples = Math.min(points.length, Math.max(50, Math.round(effectivePreviewHz * 4)));
+      const playback = {
+        points,
+        min,
+        range,
+        visibleSamples,
+        samplesPerSecond: effectivePreviewHz,
+        label: record.diagnosisLabel || 'ECG',
+        offset: 0,
+        lastTimestamp: 0
+      };
+
+      const animate = (timestamp) => {
+        if (!playback.lastTimestamp) {
+          playback.lastTimestamp = timestamp;
+        }
+
+        const delta = Math.min(timestamp - playback.lastTimestamp, 48);
+        playback.lastTimestamp = timestamp;
+        playback.offset = (playback.offset + (delta / 1000) * playback.samplesPerSecond) % playback.points.length;
+
+        renderLiveEcg(canvas, ctx, playback, timestamp);
+        ecgAnimationFrameId = requestAnimationFrame(animate);
+      };
+
+      ecgAnimationFrameId = requestAnimationFrame(animate);
+    }
+
+    function stopEcgAnimation() {
+      if (ecgAnimationFrameId) {
+        cancelAnimationFrame(ecgAnimationFrameId);
+        ecgAnimationFrameId = null;
+      }
+    }
+
+    function renderLiveEcg(canvas, ctx, playback, timestamp) {
+      const { width, height } = fitCanvasToDisplay(canvas, ctx);
+      const padding = 20;
+      const plotWidth = width - padding * 2;
+      const plotHeight = height - padding * 2;
+
+      drawMonitorBackground(ctx, width, height, padding, timestamp);
+      drawTrace(ctx, playback, padding, plotWidth, plotHeight);
+      drawSweep(ctx, padding, plotWidth, plotHeight, timestamp);
+      drawLiveBadge(ctx, timestamp, playback.label);
+    }
+
+    function fitCanvasToDisplay(canvas, ctx) {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const width = Math.max(320, Math.floor(rect.width));
+      const height = Math.max(160, Math.floor(rect.height));
+      const targetWidth = Math.floor(width * dpr);
+      const targetHeight = Math.floor(height * dpr);
+
+      if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
+      }
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return { width, height };
+    }
+
+    function drawMonitorBackground(ctx, width, height, padding, timestamp) {
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, width, height);
+
+      const gridOffset = (timestamp * 0.018) % 36;
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(46, 158, 96, 0.10)';
+      for (let x = padding - gridOffset; x < width - padding; x += 36) {
+        ctx.beginPath();
+        ctx.moveTo(x, padding);
+        ctx.lineTo(x, height - padding);
+        ctx.stroke();
+      }
+      for (let y = padding; y < height - padding; y += 30) {
+        ctx.beginPath();
+        ctx.moveTo(padding, y);
+        ctx.lineTo(width - padding, y);
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle = 'rgba(46, 158, 96, 0.18)';
+      for (let x = padding - gridOffset; x < width - padding; x += 72) {
+        ctx.beginPath();
+        ctx.moveTo(x, padding);
+        ctx.lineTo(x, height - padding);
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle = 'rgba(46, 158, 96, 0.16)';
+      ctx.beginPath();
+      ctx.moveTo(padding, height / 2);
+      ctx.lineTo(width - padding, height / 2);
+      ctx.stroke();
+    }
+
+    function drawTrace(ctx, playback, padding, plotWidth, plotHeight) {
+      const visibleSamples = playback.visibleSamples;
+      const drawPath = () => {
+        ctx.beginPath();
+        for (let x = 0; x <= plotWidth; x += 2) {
+          const sampleIndex = playback.offset + (x / plotWidth) * visibleSamples;
+          const value = interpolatePoint(playback.points, sampleIndex);
+          const y = padding + plotHeight - ((value - playback.min) / playback.range) * plotHeight;
+          if (x === 0) {
+            ctx.moveTo(padding + x, y);
+          } else {
+            ctx.lineTo(padding + x, y);
+          }
+        }
+      };
+
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+
+      ctx.save();
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = 'rgba(46, 158, 96, 0.25)';
+      ctx.strokeStyle = 'rgba(46, 158, 96, 0.28)';
+      ctx.lineWidth = 5;
+      drawPath();
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.strokeStyle = '#1a6b3c';
+      ctx.lineWidth = 2.4;
+      drawPath();
+      ctx.stroke();
+    }
+
+    function drawSweep(ctx, padding, plotWidth, plotHeight, timestamp) {
+      const sweepX = padding + ((timestamp * 0.12) % plotWidth);
+      const gradient = ctx.createLinearGradient(sweepX - 42, 0, sweepX + 10, 0);
+      gradient.addColorStop(0, 'rgba(46, 158, 96, 0)');
+      gradient.addColorStop(0.82, 'rgba(46, 158, 96, 0.08)');
+      gradient.addColorStop(1, 'rgba(46, 158, 96, 0.24)');
+
+      ctx.fillStyle = gradient;
+      ctx.fillRect(Math.max(padding, sweepX - 42), padding, 52, plotHeight);
+      ctx.strokeStyle = 'rgba(46, 158, 96, 0.42)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(sweepX, padding);
+      ctx.lineTo(sweepX, padding + plotHeight);
+      ctx.stroke();
+    }
+
+    function drawLiveBadge(ctx, timestamp, label) {
+      const pulse = 0.55 + Math.sin(timestamp / 180) * 0.25;
+      ctx.fillStyle = `rgba(239, 68, 68, ${pulse})`;
+      ctx.beginPath();
+      ctx.arc(21, 21, 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#1a6b3c';
+      ctx.font = '700 11px Segoe UI';
+      ctx.fillText('LIVE', 32, 25);
+      ctx.font = '600 11px Segoe UI';
+      ctx.fillStyle = '#52635b';
+      ctx.fillText(String(label || 'ECG').slice(0, 34), 74, 25);
+    }
+
+    function interpolatePoint(points, index) {
+      const length = points.length;
+      const normalized = ((index % length) + length) % length;
+      const low = Math.floor(normalized);
+      const high = (low + 1) % length;
+      const ratio = normalized - low;
+      return points[low] + (points[high] - points[low]) * ratio;
+    }
+
+    function statusPill(status) {
+      const className = status === 'CRITICAL' ? 'status-critical' : status === 'WATCH' ? 'status-watch' : 'status-healthy';
+      return `<span class="status-pill ${className}">${escapeHtml(status || 'UNKNOWN')}</span>`;
+    }
+
+    function setApiState(text, className) {
+      const element = document.getElementById('api-state');
+      element.textContent = text;
+      element.className = `status-pill ${className}`;
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3600);
+    }
+
+    function formatValue(value, suffix = '') {
+      return value === null || value === undefined ? '-' : `${value}${suffix}`;
+    }
+
+    function formatRange(min, max, suffix = '') {
+      if (min === null || min === undefined || max === null || max === undefined) return '-';
+      return min === max ? `${min}${suffix}` : `${min}-${max}${suffix}`;
+    }
+
+    function formatDate(value) {
+      if (!value) return '-';
+      return new Date(value).toLocaleString();
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+  </script>
+</body>
+</html>
