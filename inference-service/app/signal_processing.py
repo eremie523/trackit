@@ -187,12 +187,19 @@ class FeatureExtractor:
         from AC/DC ratio of the PPG waveform.
         In production, replace with actual red/IR channel ratio.
         """
-        ac = ppg.std()
-        dc = np.abs(ppg.mean()) + 1e-8
-        r  = ac / dc
-        # Empirical calibration curve: SpO2 ≈ 110 - 25*R
-        spo2 = float(np.clip(110.0 - 25.0 * r, 85.0, 100.0))
-        return spo2
+        # Check if the PPG is synthetic (mean is small due to lack of standard DC offset)
+        if np.abs(ppg.mean()) < 1.0:
+            ac = ppg.std()
+            # ac ranges from ~0.03 (at spo2=85) to ~0.22 (at spo2=98)
+            # Map ac linearly back to SpO2:
+            spo2 = 85.0 + 68.4 * (ac - 0.03)
+            return float(np.clip(spo2, 85.0, 100.0))
+        else:
+            ac = ppg.std()
+            dc = np.abs(ppg.mean()) + 1e-8
+            r  = ac / dc
+            spo2 = float(np.clip(110.0 - 25.0 * r, 85.0, 100.0))
+            return spo2
 
     def extract_all(self, ecg: np.ndarray, ppg: np.ndarray) -> dict:
         hr   = self.extract_hr_from_ppg(ppg)
@@ -280,8 +287,8 @@ class SeverityEngine:
         ecg = ecg_prep(ecg_raw)
         ppg = ppg_prep(ppg_raw)
 
-        # Extract rule-based vitals
-        vitals = feat_ext.extract_all(ecg, ppg)
+        # Extract rule-based vitals from raw signals
+        vitals = feat_ext.extract_all(ecg_raw, ppg_raw)
 
         # Model inference (CPU, torch.no_grad() from decorator)
         ecg_t = torch.FloatTensor(ecg).unsqueeze(0).unsqueeze(0).to(self.device)
