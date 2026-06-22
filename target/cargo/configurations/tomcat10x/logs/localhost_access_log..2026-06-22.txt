@@ -1,0 +1,7 @@
+127.0.0.1 - - [22/Jun/2026:11:32:05 +0100] "GET /cargocpc/index.html HTTP/1.1" 200 124
+127.0.0.1 - - [22/Jun/2026:11:33:38 +0100] "GET /trackit/patient-view.html HTTP/1.1" 200 44791
+127.0.0.1 - - [22/Jun/2026:11:33:39 +0100] "GET /trackit/css/styles.css HTTP/1.1" 200 5170
+127.0.0.1 - - [22/Jun/2026:11:33:39 +0100] "GET /trackit/js/api.js HTTP/1.1" 200 1755
+127.0.0.1 - - [22/Jun/2026:11:33:40 +0100] "GET /trackit/patients HTTP/1.1" 200 663
+127.0.0.1 - - [22/Jun/2026:11:33:40 +0100] "GET /favicon.ico HTTP/1.1" 404 683
+127.0.0.1 - - [22/Jun/2026:11:33:54 +0100] "GET /trackit/ws/ecg-monitor HTTP/1.1" 101 -
