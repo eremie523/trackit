@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trackit – Wireless Emergency Telemedicine System</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+   *{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+  }
+  html,
+  body{
+      width:100%;
+      overflow-x:hidden;
+  }
+  img,
+  svg{
+      max-width:100%;
+  }
+
+    /* Light pastel wave – top-right */
+    .wave-light {
+      position: fixed;
+      right: 0;
+      top: 60px;
+      width: 54%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Dark green wave – bottom */
+    .wave-dark {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .hero {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 74px);
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .hero h1 {
+      font-size: 2.9rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      line-height: 1.25;
+      max-width: 700px;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      font-weight: 800;
+    }
+
+    .hero h1 span {
+      color: var(--green-dark);
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--text-mid);
+      max-width: 580px;
+      line-height: 1.65;
+    }
+    /* ==========================
+   NAVBAR
+========================== */
+
+.navbar{
+    position: relative;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 16px;
+    width:100%;
+    box-sizing:border-box;
+    overflow:hidden;
+}
+
+/* Logo */
+
+.navbar-brand{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-shrink:1;
+    min-width:0;
+}
+
+.logo-icon{
+    width:34px;
+    height:34px;
+    flex-shrink:0;
+}
+
+.brand-name{
+    font-size:1.2rem;
+    white-space:nowrap;
+}
+
+/* Desktop links */
+.navbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.navbar-brand{
+    margin-right:auto;
+}
+
+.navbar-actions{
+    margin-left:auto;
+    margin-right:10px;
+}
+
+.navbar-nav{
+    display:flex;
+    gap:24px;
+}
+
+/* Buttons */
+
+.navbar-actions{
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.navbar-actions .btn{
+    padding:8px 12px;
+    font-size:.85rem;
+    white-space:nowrap;
+}
+
+/* Toggle */
+
+.menu-toggle{
+    display:none;
+    border:none;
+    background:none;
+    font-size:1.8rem;
+    cursor:pointer;
+    line-height:1;
+    padding:0;
+    flex-shrink:0;
+}
+/* RESPONSIVE NAVBAR */
+
+@media (max-width:1024px){
+
+ /* Navbar */
+
+  .navbar{
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:12px 15px;
+      overflow:visible;
+  }
+
+  /* Logo */
+
+  .navbar-brand{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-right:auto;
+  }
+
+  .logo-icon{
+      width:32px;
+      height:32px;
+  }
+
+  .brand-name{
+      font-size:1.1rem;
+  }
+
+  /* Hide desktop links */
+
+  .navbar-nav{
+      display:none;
+
+      position:absolute;
+      top: 100%;
+      width:60%;
+      right: 12px;
+      background:#b4f5cf;
+      box-shadow:0 8px 20px rgba(0,0,0,.08);
+      z-index:9999;
+  }
+
+  /* Show menu when JS adds class */
+
+  .navbar-nav.show{
+      display:block !important;
+     border-radius: 20px;
+      
+  }
+
+  .navbar-nav li{
+      list-style:none;
+      /*border-bottom:1px solid #f3f3f3;*/
+  }
+
+  .navbar-nav li a{
+      display:block;
+      width:100%;
+      padding:15px;
+      text-align:center;
+      text-decoration:none;
+  }
+
+  /* Buttons */
+
+  .navbar-actions{
+      display:flex;
+      gap:6px;
+      margin-left:auto;
+      margin-right:10px;
+  }
+
+  .navbar-actions .btn{
+      padding:6px 10px;
+      font-size:.75rem;
+      white-space:nowrap;
+  }
+
+  /* Toggle */
+
+  .menu-toggle{
+      display:block;
+      background:none;
+      border:none;
+      cursor:pointer;
+      font-size:1.6rem;
+      color:#1a6b3c;
+      line-height:1;
+  }
+  }
+
+
+  /* TABLETS*/
+
+  @media (max-width:768px){
+
+    .brand-name{
+      font-size:1rem;
+    }
+
+    .logo-icon{
+      width:28px;
+      height:28px;
+    }
+    .navbar-actions .btn{
+      padding:5px 8px;
+      font-size:.70rem;
+    }
+    .menu-toggle{
+      font-size:1.5rem;
+    }
+   
+
+  }
+
+
+  /*  MOBILE */
+
+  @media (max-width:500px){
+
+  .navbar{
+      padding:10px;
+  }
+
+  .brand-name{
+      font-size:.9rem;
+  }
+
+  .logo-icon{
+      width:26px;
+      height:26px;
+  }
+
+  .navbar-actions{
+      gap:4px;
+      margin-right:6px;
+  }
+
+  .navbar-actions .btn{
+      padding:5px 7px;
+      font-size:.65rem;
+  }
+
+  .menu-toggle{
+      font-size:1.4rem;
+  }
+
+  .hero h1{
+      font-size:2rem;
+      line-height:1.2;
+  }
+
+  .hero p{
+      font-size:.95rem;
+      line-height:1.6;
+  }
+  }
+
+
+  /*  VERY SMALL PHONES */
+
+  @media (max-width:350px){
+
+  .brand-name{
+      font-size:.8rem;
+  }
+
+  .logo-icon{
+      width:22px;
+      height:22px;
+  }
+
+  .navbar-actions .btn{
+      padding:4px 6px;
+      font-size:.58rem;
+  }
+
+  .menu-toggle{
+      font-size:1.2rem;
+  }
+
+  .hero h1{
+      font-size:1.7rem;
+  }
+
+  .hero p{
+      font-size:.85rem;
+  }
+}
+  </style>
+</head>
+<body>
+
+  <!-- Light wave top-right -->
+  <svg class="wave-light" viewBox="0 0 700 560" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M700 0 C600 80, 450 40, 350 130 C250 220, 150 180, 0 260 L0 560 L700 560 Z"
+          fill="#d6f0e0" opacity="0.7"/>
+  </svg>
+
+  <!-- Dark wave bottom -->
+  <svg class="wave-dark" viewBox="0 0 1280 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0 280 C80 230, 200 320, 350 270 C480 225, 560 300, 700 240
+             C840 178, 950 280, 1100 220 C1200 178, 1250 200, 1280 190 
+             L1280 420 L0 420 Z"
+          fill="url(#waveGradDark)"/>
+    <defs>
+      <linearGradient id="waveGradDark" x1="0" y1="0" x2="1280" y2="0">
+        <stop offset="0%" stop-color="#3cb871" stop-opacity="0.45"/>
+        <stop offset="100%" stop-color="#1a6b3c"/>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-brand">
+      <!-- Trackit + icon -->
+      <svg class="logo-icon" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="21" cy="21" r="21" fill="#f1f5f9"/>
+        <!-- Google-colours plus sign -->
+        <rect x="18" y="8"  width="6" height="26" rx="2" fill="#34a853"/>
+        <rect x="8"  y="18" width="26" height="6"  rx="2" fill="#ea4335"/>
+        <rect x="8"  y="18" width="13" height="6"  rx="2" fill="#4285f4"/>
+        <rect x="18" y="8"  width="6"  height="13" rx="2" fill="#fbbc05"/>
+      </svg>
+      <span class="brand-name">trackit</span>
+    </a>
+    <ul class="navbar-nav">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="patient-portal.html">Patient Portal</a></li>
+    </ul>
+    <div class="navbar-actions">
+      <a href="login.html" class="btn btn-primary">Doctor Login</a>
+    </div>
+    <button class="menu-toggle" id="menuToggle">
+      ☰
+    </button>
+  </nav>
+
+  <!-- Hero -->
+  <main class="hero">
+    <h1>
+      <em>Wireless</em> <span>Emergency<br>Telemedicine System</span>
+    </h1>
+    <p>
+      Transforming emergency medical care by combining mobility, connectivity,
+      and digital health tools to deliver prompt and accurate healthcare services
+      anytime and anywhere.
+    </p>
+  </main>
+<!-------------for toggle menu--------------->
+  <script>
+   /* function toggleMenu() {
+        const nav = document.querySelector('.navbar-nav');
+        const btn = document.querySelector('.menu-toggle');
+    
+        nav.classList.toggle('show');
+    
+        if(nav.classList.contains('show')){
+            btn.innerHTML = "✕";
+        } else {
+            btn.innerHTML = "☰";
+        }
+    }
+   function toggleMenu() {
+    alert("Button clicked");
+}
+
+function toggleMenu() {
+
+    const menu = document.querySelector('.navbar-nav');
+
+    menu.classList.toggle('show');
+
+    console.log("toggle clicked");
+}*/
+document.addEventListener("DOMContentLoaded", () => {
+
+const btn = document.getElementById("menuToggle");
+const nav = document.querySelector(".navbar-nav");
+
+btn.addEventListener("click", () => {
+
+    //console.log("clicked");
+
+    nav.classList.toggle("show");
+
+    btn.textContent =
+        nav.classList.contains("show")
+        ? "✕"
+        : "☰";
+
+});
+
+});
+    </script>
+
+</body>
+</html>
